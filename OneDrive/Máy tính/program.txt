@@ -1,0 +1,17 @@
+namespace 
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+
+
+        }
+    }
+}
+
+
+
+
+
+Console.WriteLine("Lion\n" +"Mane: " + Mane + "/ Name: " + Name + "/ Age: " + Age +"/ Date: "  );
