@@ -1,0 +1,36 @@
+{
+  "name": "nasa-project-api-20110031",
+  "version": "1.0.0",
+  "description": "NASA Mission Control API",
+  "main": "src/server.js",
+  "scripts": {
+    "test": "jest",
+    "test-watch": "jest --watch",
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js"
+  },
+  "keywords": [
+    "nodejs",
+    "expressjs"
+  ],
+  "author": "20110031@student.hcmute.edu.vn",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/thien1103/NASA_20110031"
+  },
+  "homepage": "https://github.com/thien1103/NASA_20110031",
+  "dependencies": {
+    "axios": "^1.6.2",
+    "cors": "^2.8.5",
+    "csv-parse": "^5.5.2",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "mongoose": "^8.0.1",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nodemon": "^3.0.1",
+    "supertest": "^6.3.3"
+  }
+}
