@@ -1,18 +1,19 @@
-
 import { useState } from "react";
 import {
-  UserOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
+  ToolOutlined,
+  ContainerOutlined,
+  TeamOutlined,
   LogoutOutlined,
 } from "@ant-design/icons";
-import { Button, Dropdown, Flex, Layout, Menu, theme } from "antd";
+import { Button, Dropdown, Layout, Menu, theme } from "antd";
 import { Avatar } from "antd";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import logoSideBar from "/src/assets/logo2.png" ;
 const { Header, Content, Footer, Sider } = Layout;
 
-const UserPage = () => {
+const InstructorPage = () => {
   const navigate = useNavigate();
   const handleLogout = () => {
     navigate("/");
@@ -22,21 +23,21 @@ const UserPage = () => {
   const sliced_text = location.pathname.split("/")[2];
   const handleContents = (data) => {
     switch (data.key) {
-/***    case "account":
-        navigate(`/user/${data.key}`);
-        break;
-      case "thesis":
-        navigate(`/user/${data.key}`);
-        break;     ***/
-      case "user-account":
-        navigate(`/user/${data.key}`);
+      case "account-management":
+        navigate(`/instructor/${data.key}`);
         break;
       case "select-thesis":
-        navigate(`/user/${data.key}`);
-        break; 
-      case "manage-thesis":
-      navigate(`/user/${data.key}`);
-      break;   
+      navigate(`/instructor/${data.key}`);
+      break;
+      case "thesis-approvement":
+      navigate(`/instructor/${data.key}`);
+      break;
+      case "thesis-management":
+        navigate(`/instructor/${data.key}`);
+        break;  
+        case "schedule-instructor":
+            navigate(`/instructor/${data.key}`);
+            break;
       default:
         break;
     }
@@ -50,9 +51,13 @@ const UserPage = () => {
     };
   }
   const siderItems = [
-    getItem("Thông tin sinh viên", "user-account", <UserOutlined />),
-    getItem("Đăng kí đề tài", "select-thesis", <UserOutlined />),
-    getItem("Quản lí đề tài", "manage-thesis", <UserOutlined />),
+    getItem("Quản lý Tài Khoản", "account-management", <ToolOutlined />),
+    getItem("Đăng Kí Đề Tài", "select-thesis", <ContainerOutlined />),
+    getItem("Duyệt Đề Tài", "thesis-approvement", <ToolOutlined />),
+    getItem("Quản Lý Đề Tài", "thesis-management", <TeamOutlined />),
+    getItem("Phân GV Phản Biện", "schedule-instructor", <ToolOutlined />),
+   // getItem("Quản lý đợt đăng kí đề tài", "create-account", <UserAddOutlined />),
+
     // getItem("", "5", <FileOutlined />),
   ];
   const onClick = ({ key }) => {
@@ -139,11 +144,9 @@ const UserPage = () => {
         <Content
           style={{
             margin: "24px 16px 0",
-            maxWidth: "100%",
-            maxHeight: "50%",
           }}
         >
-      
+          
           <Outlet />
         </Content>
         <Footer
@@ -151,12 +154,12 @@ const UserPage = () => {
             textAlign: "center",
           }}
         >
-         
+          Thesis Management @ Team PVDK <br/>
+          Contributed by team 147
         </Footer>
       </Layout>
     </Layout>
   );
 };
 
-export default UserPage;
-
+export default InstructorPage;

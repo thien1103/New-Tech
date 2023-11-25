@@ -1,17 +1,6 @@
 import {
-    Avatar,
-    Button,
-    Col,
-    Divider,
-    Drawer,
-    Form,
-    Input,
-    Row,
-    Space,
-    Table,
-    Tag,
-  } from "antd";
-  import { EyeOutlined } from "@ant-design/icons";
+    Avatar,   Button,   Col,    Divider,   Drawer,   Form,   Input,  Row,Space, Table} from "antd";
+  import { EyeOutlined, UserAddOutlined } from "@ant-design/icons";
   import dayjs from "dayjs";
   import { useState } from "react";
   import { useSearchParams } from "react-router-dom";
@@ -21,7 +10,7 @@ import {
       {content}
     </div>
   );
-  const InstructorProfiles = (props) => {
+  const ContactInformation = (props) => {
     const { bg } = props;
     const [form] = Form.useForm();
     const [open, setOpen] = useState(false);
@@ -52,36 +41,45 @@ import {
       {
         userAvatar:
           "https://s3.ap-southeast-1.amazonaws.com/family.circle/avatar/AVATAR_tB5idnWvVj.jpg",
-        userFullName: "Nguyen Tran Thi Van",
+        userFullName: "Nguyen Van A",
         userEmail: "test@gmail.com",
         phone: "0123456789",
-        specialization: "Software Technology",
-        position: "Viet Nam",
+        dateOfBirth: "12/07/2002 10:06:06",
+        status: 1,
+        address: "123 Nguyen Van A",
+        major: "C",
+  
       },
       {
         userAvatar:
           "https://s3.ap-southeast-1.amazonaws.com/family.circle/avatar/AVATAR_tB5idnWvVj.jpg",
-        userFullName: "Nguyen Dang Quang",
-        userEmail: "test2@gmail.com",
+        userFullName: "Nguyen Van B",
+        userEmail: "test123@gmail.com",
         phone: "0123456789",
-        specialization: "Information Systems",
-        position: "Viet Nam",
+        dateOfBirth: "25/05/2002 10:06:06",
+        status: 3,
+        address: "123 Nguyen Van B",
+        major: "B",
+  
       },
       {
         userAvatar:
           "https://s3.ap-southeast-1.amazonaws.com/family.circle/avatar/AVATAR_tB5idnWvVj.jpg",
-        userFullName: "Hoang Van Dung",
-        userEmail: "test3@gmail.com",
+        userFullName: "Nguyen Van C",
+        userEmail: "test3333@gmail.com",
         phone: "0123456789",
-        specialization: "Artificial Intelligence",
-        position: "Viet Nam",
+        dateOfBirth: "07/07/2002 10:06:06",
+        status: 2,
+        address: "123 Nguyen Van C",
+        major: "A",
+  
       },
     ];
     const columns = [
       {
         title: "Avatar",
-        dataIndex: "instructorAvatar",
-        key: "instructorAvatar",
+        dataIndex: "userAvatar",
+        key: "userAvatar",
         align: "center",
         render: (_, record) => (
           <Avatar
@@ -98,7 +96,7 @@ import {
         align: "center",
       },
       {
-        title: "Fullname",
+        title: "Tên Giảng Viên",
         dataIndex: "userFullName",
         key: "userFullName",
         align: "center",
@@ -110,25 +108,42 @@ import {
         align: "center",
       },
       {
-        title: "Phone",
+        title: "Số điện thoại",
         dataIndex: "phone",
         key: "phone",
         align: "center",
       },
       {
-        title: "Specialization",
-        dataIndex: "specialization",
-        key: "specialization",
+        title: "Địa chỉ",
+        dataIndex: "address",
+        key: "address",
         align: "center",
       },
       {
-        title: "Position",
-        dataIndex: "position",
-        key: "position",
+        title: "Chuyên ngành",
+        dataIndex: "major",
+        key: "major",
         align: "center",
       },
+      /***{
+        title: "Reputation",
+        dataIndex: "reputation",
+        key: "reputation",
+        align: "center",
+        render: (_, record) => {
+          let color = "";
+          if (record.reputation >= 8) {
+            color = "green";
+          } else if (record.reputation >= 5) {
+            color = "yellow";
+          } else {
+            color = "red";
+          }
+          return <Tag color={color}>{record.reputation}</Tag>;
+        },
+      }, ***/
       {
-        title: "Morde detail",
+        title: "Thêm chi tiết",
         key: "moredetail",
         align: "center",
         render: (_, record) => (
@@ -152,10 +167,10 @@ import {
       >
         <div className=" mb-2 pb-2 border-b-[1px] border-black border-solid">
           <Form layout="inline" onFinish={handleSearch} form={form}>
-            <Form.Item label="Full name" name="fullName">
+            <Form.Item label="Name" name="fullName">
               <Input defaultValue={searchParams.get("fullName")}></Input>
             </Form.Item>
-            <Form.Item label="ID" name="instructorID">
+            <Form.Item label="ID" name="ID">
               <Input defaultValue={searchParams.get("ID")}></Input>
             </Form.Item>
             <Form.Item>
@@ -260,5 +275,5 @@ import {
     );
   };
   
-  export default InstructorProfiles;
+  export default ContactInformation;
   

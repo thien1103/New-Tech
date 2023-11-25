@@ -1,5 +1,4 @@
-import {
-    Avatar,   Button,   Col,    Divider,   Drawer,   Form,   Input,  Row,Space, Table} from "antd";
+import {Modal, Avatar,   Button,   Col,    Divider,   Drawer,   Form,   Input,  Row,Space, Table} from "antd";
   import { EyeOutlined, UserAddOutlined } from "@ant-design/icons";
   import dayjs from "dayjs";
   import { useState } from "react";
@@ -20,6 +19,18 @@ import {
     const onClose = () => {
       setOpen(false);
     };
+    const openModal = () => {
+      setIsModalVisible(true);
+  };
+
+  const closeModal = () => {
+      setIsModalVisible(false);
+  };
+  const handleAdd = () => {
+    // Show the edit modal
+    openModal();
+};
+    const [isModalVisible, setIsModalVisible] = useState(false);
     const [searchParams, setSearchParams] = useSearchParams();
     const handleSearch = async (values) => {
       for (const key in values) {
@@ -222,7 +233,7 @@ import {
           <Table dataSource={data} columns={columns} bordered></Table>
           <Button
         className="justify-center align-center flex bg-green-700 text-white hover:!text-white hover:!border-none max-w-max"
-        onClick={("")}
+        onClick={() => handleAdd()}
       >
         <span>
           <UserAddOutlined /> &ensp; Thêm sinh viên
@@ -311,6 +322,37 @@ import {
             </Row>
           </Drawer>
         </div>
+        <Modal
+                title="Thêm Sinh Viên"
+                visible={isModalVisible}
+                onCancel={closeModal}
+                footer={null}
+                width={500}
+                bodyStyle={{ height: '300px', overflow: 'auto' }}
+                style={{
+                    position: "relative",
+                    top: 50,
+
+                }}
+            >
+                <div>
+                    <Form className="mt-10">
+                        <Form.Item>
+                            <span>something here</span>
+                              <Input/>
+                            
+                            <Button
+                                className="justify-center align-center flex bg-green-700 text-white hover:!text-white hover:!border-none max-w-max top-40 left-40 relative"
+                                onClick={() => {}}
+                            >
+                                <span>
+                                   Xác nhận
+                                </span>
+                            </Button>
+                        </Form.Item>
+                    </Form>
+                </div>
+            </Modal>
       </div>
     );
   };

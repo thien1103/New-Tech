@@ -19,7 +19,7 @@ const getBase64 = (img, callback) => {
     return isJpgOrPng && isLt2M;
   };
 
-const EditUserInfo = (props) => {
+const EditInstructorInfo = (props) => {
   const { bg } = props;
   const [loading, setLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState();
@@ -115,6 +115,13 @@ const EditUserInfo = (props) => {
           >
             <Input size="large" />
           </Form.Item>
+          <Form.Item
+            label="Date Of Birth"
+            name="dateOfBirth"
+            
+          >
+            <Input size="large" />
+          </Form.Item>
           
           {/* Add more form items for the first column */}
         </Form>
@@ -167,4 +174,4 @@ const EditUserInfo = (props) => {
     );
   };
   
-  export default EditUserInfo;
+  export default EditInstructorInfo;

@@ -1,5 +1,5 @@
 import {
-  Avatar,
+  Modal,
   Button,
   Col,
   Divider,
@@ -7,12 +7,11 @@ import {
   Form,
   Input,
   Row,
-  Space,
+
   Table,
-  Tag,
+
 } from "antd";
-import { EyeOutlined, FileAddOutlined  } from "@ant-design/icons";
-import dayjs from "dayjs";
+import { EyeOutlined, FileAddOutlined,  } from "@ant-design/icons";
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 const DescriptionItem = ({ title, content }) => (
@@ -25,12 +24,6 @@ const ThesisManagement = (props) => {
   const { bg } = props;
   const [form] = Form.useForm();
   const [open, setOpen] = useState(false);
-  const showDrawer = () => {
-    setOpen(true);
-  };
-  const onClose = () => {
-    setOpen(false);
-  };
   const [searchParams, setSearchParams] = useSearchParams();
   const handleSearch = async (values) => {
     for (const key in values) {
@@ -44,22 +37,32 @@ const ThesisManagement = (props) => {
     }
     setSearchParams(values);
   };
+
+  const openModal = () => {
+    setIsModalVisible(true);
+};
+
+const closeModal = () => {
+    setIsModalVisible(false);
+};
+const handleAdd = () => {
+  // Show the edit modal
+  openModal();
+};
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
   const handleReset = () => {
     setSearchParams({});
     form.resetFields();
   };
   const data = [
     {
-      userAvatar:
-        "https://s3.ap-southeast-1.amazonaws.com/family.circle/avatar/AVATAR_tB5idnWvVj.jpg",
       ID: " ",
       thesisName: "",
       specialization: "",
       time: "",
     },
     {
-      userAvatar:
-        "https://s3.ap-southeast-1.amazonaws.com/family.circle/avatar/AVATAR_tB5idnWvVj.jpg",
       ID: " ",
       thesisName: "",
       specialization: "",
@@ -69,46 +72,33 @@ const ThesisManagement = (props) => {
   ];
   const columns = [
     {
-      title: "Avatar",
-      dataIndex: "userAvatar",
-      key: "userAvatar",
-      align: "center",
-      render: (_, record) => (
-        <Avatar
-          src={
-            "https://s3.ap-southeast-1.amazonaws.com/family.circle/avatar/AVATAR_tB5idnWvVj.jpg"
-          }
-        />
-      ),
-    },
-    {
       title: "ID",
-      dataIndex: "userAccountID",
-      key: "userAccountID",
+      dataIndex: "thesisID",
+      key: "thesisID",
       align: "center",
     },
     {
       title: "Tên đề tài",
-      dataIndex: "userFullName",
-      key: "userFullName",
+      dataIndex: "thesisName",
+      key: "thesisName",
       align: "center",
     },
     {
       title: "Chuyên ngành",
-      dataIndex: "userEmail",
-      key: "userEmail",
+      dataIndex: "major",
+      key: "major",
       align: "center",
     },
     {
       title: "GVHD",
-      dataIndex: "phone",
-      key: "phone",
+      dataIndex: "gvhd",
+      key: "gvhd",
       align: "center",
     },
     {
       title: "Thời gian thực hiện",
-      dataIndex: "address",
-      key: "address",
+      dataIndex: "time",
+      key: "time",
       align: "center",
     },
     {
@@ -168,95 +158,43 @@ const ThesisManagement = (props) => {
         <Table dataSource={data} columns={columns} bordered></Table>
         <Button
       className="justify-center align-center flex bg-green-700 text-white hover:!text-white hover:!border-none max-w-max"
-      onClick={("")}
+      onClick={() => handleAdd()}
     >
       <span>
         <FileAddOutlined /> &ensp; Thêm đề tài
       </span>
     </Button>
-        <Drawer
-          width={640}
-          placement="right"
-          // closable={false}
-          onClose={onClose}
-          open={open}
-          // extra={
-          //   <Space>
-          //     <Button onClick={onClose}>Cancel</Button>
-          //   </Space>
-          // }
-        >
-          <p
-            className=" block mb-[16px] text-[16px] leading-[1.5175]"
-            style={{
-              marginBottom: 24,
-            }}
-          >
-            User Profile
-          </p>
-          <p className="site-description-item-profile-p">Personal</p>
-          <Row>
-            <Col span={12}>
-              <DescriptionItem title="Full Name" content="Lily" />
-            </Col>
-            <Col span={12}>
-              <DescriptionItem
-                title="Account"
-                content="AntDesign@example.com"
-              />
-            </Col>
-          </Row>
-          <Row>
-            <Col span={12}>
-              <DescriptionItem title="City" content="HangZhou" />
-            </Col>
-            <Col span={12}>
-              <DescriptionItem title="Country" content="China🇨🇳" />
-            </Col>
-          </Row>
-          <Row>
-            <Col span={12}>
-              <DescriptionItem title="Birthday" content="February 2,1900" />
-            </Col>
-            <Col span={12}>
-              <DescriptionItem title="Website" content="-" />
-            </Col>
-          </Row>
-          <Row>
-            <Col span={24}>
-              <DescriptionItem
-                title="Message"
-                content="Make things as simple as possible but no simpler."
-              />
-            </Col>
-          </Row>
-          <Divider />
-          <p className="site-description-item-profile-p">Contacts</p>
-          <Row>
-            <Col span={12}>
-              <DescriptionItem title="Email" content="AntDesign@example.com" />
-            </Col>
-            <Col span={12}>
-              <DescriptionItem
-                title="Phone Number"
-                content="+86 181 0000 0000"
-              />
-            </Col>
-          </Row>
-          <Row>
-            <Col span={24}>
-              <DescriptionItem
-                title="Github"
-                content={
-                  <a href="http://github.com/ant-design/ant-design/">
-                    github.com/ant-design/ant-design/
-                  </a>
-                }
-              />
-            </Col>
-          </Row>
-        </Drawer>
       </div>
+      <Modal
+                title="Thêm Đề Tài"
+                visible={isModalVisible}
+                onCancel={closeModal}
+                footer={null}
+                width={500}
+                bodyStyle={{ height: '300px', overflow: 'auto' }}
+                style={{
+                    position: "relative",
+                    top: 50,
+
+                }}
+            >
+                <div>
+                    <Form className="mt-10">
+                        <Form.Item>
+                            <span>something here</span>
+                            <Input/>
+                            <Button
+                                className="justify-center align-center flex bg-green-700 text-white hover:!text-white hover:!border-none max-w-max top-40 left-40 relative"
+                                onClick={() => {}}
+                            >
+                                <span>
+                                   Xác nhận
+                                </span>
+                            </Button>
+                        </Form.Item>
+                    </Form>
+                </div>
+            </Modal>
     </div>
   );
 };
