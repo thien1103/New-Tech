@@ -1,19 +1,4 @@
-<<<<<<< HEAD
-"# haothien" 
-"# haothien" 
-"# haothien" 
-"# haothien" 
-"# haothien" 
-"# haothien" 
-"# haothien" 
-"# haothien" 
-"# haothien" 
-"# haothien" 
-"# haothien" 
-"# haothien" 
-"# haothien" 
-"# haothien" 
-"# haothien" 
+
 =======
 # React + Vite
 

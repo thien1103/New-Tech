@@ -1,5 +1,5 @@
 import { Button, Form, Input, Image} from "antd";
-const UserInfo = (props) => {
+const HeadInstructorInfo = (props) => {
   const { bg } = props;
   return (
     <div
@@ -12,14 +12,14 @@ const UserInfo = (props) => {
         alignItems: "center",
       }}
     > <div className="flex flex-col">
-<p className="font-bold text-3xl">Student Information</p>
+<p className="font-bold text-3xl">Head Instructor Information</p>
     <div className=" mb-2 pb-2 border-b-[1px] border-black border-solid"></div>
     <div className="grid grid-cols-3 gap-4">
       <div>
       <Image
       width={300}
       height={400}
-      src="https://gw.alipayobjects.com/zos/antfincdn/LlvErxo8H9/photo-1503185912284-5271ff81b9a8.webp"
+      src="https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"
     />
       </div>
       <div>
@@ -48,6 +48,13 @@ const UserInfo = (props) => {
             label="Email"
             name="email"
            
+          >
+            <Input size="large" readOnly/>
+          </Form.Item>
+          <Form.Item
+            label="Date Of Birth"
+            name="dateOfBirth"
+            
           >
             <Input size="large" readOnly/>
           </Form.Item>
@@ -97,4 +104,4 @@ const UserInfo = (props) => {
     );
   };
   
-  export default UserInfo;
+  export default HeadInstructorInfo;

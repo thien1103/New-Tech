@@ -1,10 +1,13 @@
 
 import { useState } from "react";
 import {
-  UserOutlined,
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
-  LogoutOutlined,
+    PhoneOutlined,
+    FileSearchOutlined,
+    FileTextOutlined,
+    BellOutlined,
+    MenuFoldOutlined,
+    MenuUnfoldOutlined,
+    LogoutOutlined,
 } from "@ant-design/icons";
 import { Button, Dropdown, Flex, Layout, Menu, theme } from "antd";
 import { Avatar } from "antd";
@@ -12,7 +15,7 @@ import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import logoSideBar from "/src/assets/logo2.png" ;
 const { Header, Content, Footer, Sider } = Layout;
 
-const UserPage = () => {
+const GuestPage = () => {
   const navigate = useNavigate();
   const handleLogout = () => {
     navigate("/");
@@ -28,15 +31,18 @@ const UserPage = () => {
       case "thesis":
         navigate(`/user/${data.key}`);
         break;     ***/
-      case "user-account":
-        navigate(`/user/${data.key}`);
+      case "notification":
+        navigate(`/guest/${data.key}`);
         break;
-      case "select-thesis":
-        navigate(`/user/${data.key}`);
+      case "help":
+        navigate(`/guest/${data.key}`);
         break; 
-      case "manage-thesis":
-      navigate(`/user/${data.key}`);
-      break;   
+      case "reference-topic":
+      navigate(`/guest/${data.key}`);
+      break;  
+      case "contact-info":
+      navigate(`/guest/${data.key}`);
+      break;  
       default:
         break;
     }
@@ -50,9 +56,10 @@ const UserPage = () => {
     };
   }
   const siderItems = [
-    getItem("Thông tin sinh viên", "user-account", <UserOutlined />),
-    getItem("Đăng kí đề tài", "select-thesis", <UserOutlined />),
-    getItem("Quản lí đề tài", "manage-thesis", <UserOutlined />),
+    getItem("Thông báo", "notification", <BellOutlined />),
+    getItem("Hướng dẫn", "help", <FileTextOutlined />),
+    getItem("Đề tài tham khảo", "reference-topic", <FileSearchOutlined />),
+    getItem("Thông tin liên hệ", "contact-info", <PhoneOutlined />),
     // getItem("", "5", <FileOutlined />),
   ];
   const onClick = ({ key }) => {
@@ -158,5 +165,5 @@ const UserPage = () => {
   );
 };
 
-export default UserPage;
+export default GuestPage;
 

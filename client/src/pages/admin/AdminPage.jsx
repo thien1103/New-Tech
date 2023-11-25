@@ -12,7 +12,7 @@ import {
 import { Button, Dropdown, Layout, Menu, theme } from "antd";
 import { Avatar } from "antd";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import logoSideBar from "/src/assets/logo2.svg" ;
+import logoSideBar from "/src/assets/logo2.png" ;
 const { Header, Content, Footer, Sider } = Layout;
 
 const AdminPage = () => {
@@ -89,7 +89,7 @@ const AdminPage = () => {
         collapsible
         collapsed={collapsed}
       >
-        <div className="demo-logo-vertical flex justify-center  items-center hover:cursor-pointer relative top-5 left-12 w-1/2 h-[100px] bg-slate-400 rounded-full text-lg font-bold text-white"><img src={logoSideBar} style={{ width: '80px'}}></img></div>
+        <div className="demo-logo-vertical flex justify-center  items-center hover:cursor-pointer relative top-5 left-6 w-3/4 h-[150px] bg-slate-400 rounded-full text-lg font-bold text-white"><img src={logoSideBar} style={{ width: '80px'}}></img></div>
         <Menu
           style={{marginTop: '30px'}}
           theme="dark"

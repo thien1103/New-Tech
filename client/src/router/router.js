@@ -2,11 +2,15 @@ import { createBrowserRouter } from "react-router-dom";
 import userRoutes from "./UserRoute";
 import adminRoutes from "./adminRoute";
 import authRoutes from "./authRoute";
+import guestRoutes from "./guestRoute";
+import instructorRoutes from "./instructorRoute";
 const initRoutes = () => {
   // Create routes array
   const routes = [];
   // Thêm các route liên quan đến AuthLayout bằng cách truyền một mảng vào,
   // sau đó cuối hàm dùng routes.push để push object authRoute
+  instructorRoutes(routes);
+  guestRoutes(routes);
   userRoutes(routes);
   adminRoutes(routes);
   authRoutes(routes);

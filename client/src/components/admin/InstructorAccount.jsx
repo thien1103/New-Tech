@@ -1,18 +1,5 @@
-import {
-    Avatar,
-    Button,
-    Col,
-    Divider,
-    Drawer,
-    Form,
-    Input,
-    Row,
-    Space,
-    Table,
-    Tag,
-  } from "antd";
+import {Modal,Avatar,Button,Col,Divider,Drawer,Form,Input,Row,Space,Table,} from "antd";
   import { UserAddOutlined, EyeOutlined } from "@ant-design/icons";
-  import dayjs from "dayjs";
   import { useState } from "react";
   import { useSearchParams } from "react-router-dom";
   const DescriptionItem = ({ title, content }) => (
@@ -25,6 +12,20 @@ import {
     const { bg } = props;
     const [form] = Form.useForm();
     const [open, setOpen] = useState(false);
+    const openModal = () => {
+      setIsModalVisible(true);
+  };
+
+  const closeModal = () => {
+      setIsModalVisible(false);
+  };
+  const handleAdd = () => {
+    // Show the edit modal
+    openModal();
+};
+    const [isModalVisible, setIsModalVisible] = useState(false);
+
+
     const showDrawer = () => {
       setOpen(true);
     };
@@ -44,6 +45,8 @@ import {
       }
       setSearchParams(values);
     };
+
+
     const handleReset = () => {
       setSearchParams({});
       form.resetFields();
@@ -91,38 +94,38 @@ import {
       },
       {
         title: "ID",
-        dataIndex: "userAccountID",
-        key: "userAccountID",
+        dataIndex: "instructorAccountID",
+        key: "instructorAccountID",
         align: "center",
       },
       {
         title: "Fullname",
-        dataIndex: "userFullName",
-        key: "userFullName",
+        dataIndex: "instructorName",
+        key: "instructorName",
         align: "center",
       },
       {
         title: "Email",
-        dataIndex: "userEmail",
-        key: "userEmail",
+        dataIndex: "instructorEmail",
+        key: "instructorEmail",
         align: "center",
       },
       {
         title: "Phone",
-        dataIndex: "phone",
-        key: "phone",
+        dataIndex: "instructorPhone",
+        key: "instructorPhone",
         align: "center",
       },
       {
         title: "Address",
-        dataIndex: "address",
-        key: "address",
+        dataIndex: "instructorAddress",
+        key: "instructorAddress",
         align: "center",
       },
       {
-        title: "Class",
-        dataIndex: "class",
-        key: "class",
+        title: "Major",
+        dataIndex: "major",
+        key: "major",
         align: "center",
       },
       {
@@ -131,14 +134,7 @@ import {
         key: "password",
         align: "center",
       },
-      {
-        title: "Date of birth",
-        dataIndex: "dateOfBirth",
-        key: "dateOfBirth",
-        align: "center",
-        render: (_, record) =>
-          record.dateOfBirth && dayjs("12/07/2002 10:06:06").format("DD/MM/YYYY"),
-      },
+    
       /***{
         title: "Reputation",
         dataIndex: "reputation",
@@ -225,7 +221,7 @@ import {
           <Table dataSource={data} columns={columns} bordered></Table>
           <Button
         className="justify-center align-center flex bg-green-700 text-white hover:!text-white hover:!border-none max-w-max"
-        onClick={("")}
+        onClick={() => handleAdd()}
       >
         <span>
           <UserAddOutlined /> &ensp; Thêm giảng viên
@@ -314,6 +310,37 @@ import {
             </Row>
           </Drawer>
         </div>
+        <Modal
+                title="Thêm Giảng Viên"
+                visible={isModalVisible}
+                onCancel={closeModal}
+                footer={null}
+                width={500}
+                bodyStyle={{ height: '300px', overflow: 'auto' }}
+                style={{
+                    position: "relative",
+                    top: 50,
+
+                }}
+            >
+                <div>
+                    <Form className="mt-10">
+                        <Form.Item>
+                            <span>something here</span>
+                                <Input/>
+                            
+                            <Button
+                                className="justify-center align-center flex bg-green-700 text-white hover:!text-white hover:!border-none max-w-max top-40 left-40 relative"
+                                onClick={() => {}}
+                            >
+                                <span>
+                                   Xác nhận
+                                </span>
+                            </Button>
+                        </Form.Item>
+                    </Form>
+                </div>
+            </Modal>
       </div>
     );
   };

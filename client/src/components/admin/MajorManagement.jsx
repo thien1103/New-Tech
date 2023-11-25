@@ -1,6 +1,6 @@
 import { Button, Form, Input, Table, Modal } from "antd";
 import {  useSearchParams } from "react-router-dom";
-import {UsergroupAddOutlined} from "@ant-design/icons"; 
+import {PlusCircleOutlined} from "@ant-design/icons"; 
 import CreateCouncil from "../../pages/admin/other/CreateCouncil";
 import  { useState } from 'react';
 
@@ -123,24 +123,41 @@ const MajorManagement = (props) => {
         onClick={openModal}
       >
         <span>
-          <UsergroupAddOutlined /> &ensp; Thêm Chuyên Ngành
+          <PlusCircleOutlined /> &ensp; Thêm Chuyên Ngành
         </span>
       </Button>
 
       {/* Modal for the CreateCouncil component */}
       <Modal
-        title=""
-        visible={isModalVisible}
-        onCancel={closeModal}
-        footer={null}
-        style ={{
-          position: "relative",
-          top: 50,
-          minWidth:30,
-        }}
-      >
-        <CreateCouncil />
-      </Modal>
+                title="Thêm Chuyên Ngành"
+                visible={isModalVisible}
+                onCancel={closeModal}
+                footer={null}
+                width={500}
+                bodyStyle={{ height: '300px', overflow: 'auto' }}
+                style={{
+                    position: "relative",
+                    top: 50,
+
+                }}
+            >
+                <div>
+                    <Form className="mt-10">
+                        <Form.Item>
+                          <span>something here</span>
+                            <Input/>
+                            <Button
+                                className="justify-center align-center flex bg-green-700 text-white hover:!text-white hover:!border-none max-w-max top-40 left-40 relative"
+                                onClick={() => {}}
+                            >
+                                <span>
+                                   Xác nhận
+                                </span>
+                            </Button>
+                        </Form.Item>
+                    </Form>
+                </div>
+            </Modal>
     </div>
   );
 };
