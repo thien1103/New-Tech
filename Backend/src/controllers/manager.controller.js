@@ -2,6 +2,7 @@ const Manager = require('../models/manager.model');
 const Student = require('../models/student.model');
 const Instructor = require('../models/instructor.model');
 const Dissertation = require('../models/dissertation.model');
+const mongoose = require('mongoose');
 
 const managerController = {
 
@@ -29,8 +30,8 @@ const managerController = {
         }
     },
 
-    updateManager: async (req, res) => {
-        try {
+      updateManager: async (req, res) => {
+          try {
             const updatedManager = await Manager.findByIdAndUpdate(req.params.id, req.body, { new: true });
             if (!updatedManager) {
                 return res.status(404).json({ message: 'Không tìm thấy quản lý' });
@@ -86,49 +87,59 @@ const managerController = {
     },
     
     
-      createStudent: async (req, res) => {
-        try {
+    createStudent: async (req, res) => {
+      const session = await mongoose.startSession();
+      session.startTransaction();
+  
+      try {
           const {
-            studentID,
-            name,
-            studentCode,
-            birthday,
-            gender,
-            phone,
-            classs,
-            departemt,
-            
+              studentID,
+              name,
+              studentCode,
+              birthday,
+              gender,
+              phone,
+              classs,
+              departemt,
           } = req.body;
-      
-          const isExist = await Student.findOne({ studentCode });
-          if (isExist) {
-            return res
-              .status(400)
-              .json({ success: false, message: "Student already exist!" });
+  
+          // Tìm kiếm sinh viên theo studentCode
+          const existingStudent = await Student.findOne({ studentCode });
+  
+          // Kiểm tra xem sinh viên đã tồn tại hay chưa
+          if (existingStudent) {
+              throw new Error("Sinh viên đã tồn tại!");
           }
-      
+  
+          // Tạo một đối tượng Student mới
           const newStudent = new Student({
-            studentID,
-            name,
-            studentCode,
-            birthday,
-            gender,
-            phone,
-            departemt,
-            classs,
+              studentID,
+              name,
+              studentCode,
+              birthday,
+              gender,
+              phone,
+              departemt,
+              classs,
           });
-          await newStudent.save().then(data=>{
-            console.log(data)
-          }).catch(error=>{
-            console.log(error)
-          });
-          console.log("Create successfully");
+  
+          // Lưu sinh viên mới vào cơ sở dữ liệu
+          await newStudent.save();
+  
+          await session.commitTransaction();
+          session.endSession();
+  
+          console.log("Sinh viên đã được tạo mới thành công");
           return res.status(201).json(newStudent);
-        } catch (error) {
-            console.log(error)
-          res.status(500).json({ message:error });
-        }
-      },
+      } catch (error) {
+          await session.abortTransaction();
+          session.endSession();
+  
+          console.log(error);
+          res.status(500).json({ message: error.message });
+      }
+  },
+  
     
       deleteStudent: async (req, res) => {
         // const userID = req.params.id;
@@ -232,6 +243,9 @@ const managerController = {
 
     // manager dissẻtation
     createDissertation: async (req, res) => {
+      const session = await mongoose.startSession();
+      session.startTransaction();
+  
       try {
           const {
               dissertationID,
@@ -240,11 +254,19 @@ const managerController = {
               StudentID,
               InstructorID,
               CouncilID,
-              isInstructorAccept,
               Duration,
-              Status
+              // Thêm các trường khác tương ứng với schema của bạn
           } = req.body;
-
+  
+          // Tìm kiếm đề tài theo dissertationID
+          const existingDissertation = await Dissertation.findOne({ dissertationID });
+  
+          // Kiểm tra xem đề tài đã tồn tại hay chưa
+          if (existingDissertation) {
+              throw new Error("Đề tài đã tồn tại!");
+          }
+  
+          // Tạo một đối tượng Dissertation mới
           const newDissertation = new Dissertation({
               dissertationID,
               Name,
@@ -252,18 +274,28 @@ const managerController = {
               StudentID,
               InstructorID,
               CouncilID,
-              isInstructorAccept,
               Duration,
-              Status
+              // Thêm các trường khác tương ứng với schema của bạn
           });
-
+  
+          // Lưu đề tài mới vào cơ sở dữ liệu
           await newDissertation.save();
-          res.status(201).json(newDissertation);
+  
+          await session.commitTransaction();
+          session.endSession();
+  
+          console.log("Đề tài đã được tạo mới thành công");
+          return res.status(201).json(newDissertation);
       } catch (error) {
-          console.error('Lỗi khi tạo đề tài:', error);
-          res.status(500).json({ message: 'Lỗi máy chủ ~ createDissertation' });
+          await session.abortTransaction();
+          session.endSession();
+  
+          console.log(error);
+          res.status(500).json({ message: error.message });
       }
   },
+  
+  
 
   updateDissertation : async (req, res) => {
     try {

@@ -2,6 +2,10 @@ const mongoose = require('mongoose');
 
 
 const studentSchema = new mongoose.Schema({
+    studentID:{
+        type: Number,
+    },
+
     name: {
         type: String,
     },
@@ -39,7 +43,7 @@ const studentSchema = new mongoose.Schema({
     // Mảng các ID của đề tài mà sinh viên đã đăng ký
     registeredDissertations: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Dissertation',
+        ref: 'Guidance',
     }],
 
 });

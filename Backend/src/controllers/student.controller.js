@@ -1,5 +1,6 @@
 const Student = require('../models/student.model');
 const Dissertation = require('../models/dissertation.model');
+const Guidance = require('../models/guidance.model');
 
 
 const studentController = {
@@ -47,49 +48,66 @@ const studentController = {
     }
     },
 
-    getALLDissertation: async (req, res) => {
+    getRegisteredDissertations: async (req, res) => {
+        const studentId = req.params.studentId;
+
         try {
-            // Lấy tất cả các đề tài từ cơ sở dữ liệu
-            const allDissertations = await Dissertation.find();
-    
-            res.status(200).json(allDissertations);
+            // Kiểm tra xem sinh viên có tồn tại không
+            const student = await Student.findById(studentId);
+
+            if (!student) {
+                return res.status(404).json({ error: 'Sinh viên không tồn tại.' });
+            }
+
+            // Lấy danh sách đề tài mà sinh viên đã đăng ký
+            const registeredDissertations = await Guidance.find({
+                student: studentId,
+            }).populate('dissertation');
+
+            res.status(200).json(registeredDissertations);
         } catch (error) {
             console.error(error);
             res.status(500).json({ error: 'Đã xảy ra lỗi trong quá trình xử lý.' });
         }
     },
 
+
     registerDissertation: async (req, res) => {
         const studentId = req.params.studentId;
-    const dissertationId = req.params.dissertationId;
+        const dissertationId = req.params.dissertationId;
 
-    try {
-        // Kiểm tra xem sinh viên và đề tài có tồn tại không
-        const student = await Student.findById(studentId);
-        const dissertation = await Dissertation.findById(dissertationId);
+        try {
+            // Kiểm tra xem sinh viên và đề tài có tồn tại không
+            const student = await Student.findById(studentId);
+            const dissertation = await Dissertation.findById(dissertationId);
 
-        if (!student || !dissertation) {
-            return res.status(404).json({ error: 'Sinh viên hoặc đề tài không tồn tại.' });
+            if (!student || !dissertation) {
+                return res.status(404).json({ error: 'Sinh viên hoặc đề tài không tồn tại.' });
+            }
+
+            // Kiểm tra xem sinh viên đã đăng ký đề tài này chưa
+            const isRegistered = await Guidance.findOne({
+                student: studentId,
+                dissertation: dissertationId
+            });
+
+            if (isRegistered) {
+                return res.status(400).json({ error: 'Sinh viên đã đăng ký đề tài này.' });
+            }
+
+            // Đăng ký đề tài cho sinh viên
+            const guidance = new Guidance({
+                student: studentId,
+                dissertation: dissertationId,
+            });
+
+            await guidance.save();
+
+            res.status(200).json({ success: 'Đăng ký đề tài thành công.' });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: 'Đã xảy ra lỗi trong quá trình xử lý.' });
         }
-
-        // Kiểm tra xem sinh viên đã đăng ký đề tài này chưa
-        if (student.registeredDissertations.includes(dissertationId)) {
-            return res.status(400).json({ error: 'Sinh viên đã đăng ký đề tài này.' });
-        }
-
-        // Đăng ký đề tài cho sinh viên
-        student.registeredDissertations.push(dissertationId);
-        await student.save();
-
-        // Thêm sinh viên vào danh sách sinh viên đã đăng ký của đề tài
-        dissertation.registeredStudents.push(studentId);
-        await dissertation.save();
-
-        res.status(200).json({ success: 'Đăng ký đề tài thành công.' });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Đã xảy ra lỗi trong quá trình xử lý.' });
-    }                                                                                       
     },
     
     

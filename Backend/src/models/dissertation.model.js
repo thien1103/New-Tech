@@ -3,6 +3,10 @@ const mongoose = require('mongoose');
 
 const dissertationSchema = new mongoose.Schema({
 
+    dissertationID: {
+        type: Number,
+        // unique: true, // Bỏ comment dòng này nếu đã có
+    },
     Name: {
         type: String,
         required: true,
@@ -33,12 +37,9 @@ const dissertationSchema = new mongoose.Schema({
         type: String,
         enum: ['Pending', 'Accepted', 'Rejected', 'InProgress', 'Completed'],
     },
-    // Mảng các ID của sinh viên đã đăng ký cho đề tài
-    registeredStudents: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Student',
-    }],
-});
+
+    
+},{ limit: false });
 
 
 const Dissertation = mongoose.model('Dissertation', dissertationSchema);

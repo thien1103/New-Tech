@@ -6,8 +6,8 @@ router.get('/getProfileStudents/:studentId', studentController.getProfileStudent
 
 router.put('/edit-profile/:studentId', studentController.updateProfileStudent);
 
-router.get('/all-dissertations', studentController.getALLDissertation);
+router.get('/students/:studentId/registered-dissertations', studentController.getRegisteredDissertations);
 
-router.post('/register-dissertation/:studentId/:dissertationId', studentController.registerDissertation);
+router.post('/students/:studentId/register-dissertation/:dissertationId', studentController.registerDissertation);
 
 module.exports = router;

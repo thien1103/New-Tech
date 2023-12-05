@@ -2,10 +2,8 @@ const mongoose = require('mongoose');
 
 
 const instructorSchema = new mongoose.Schema({
-    instructorID: {
-        type: Number,
-        required: true,
-        unique: true
+    instructorID:{
+        type: Number
     },
     name: {
         type: String,
@@ -30,6 +28,10 @@ const instructorSchema = new mongoose.Schema({
     },
     specialization: {
         type: String
+    },
+    guidanceDissertations: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Guidance',
     }
 });
 
