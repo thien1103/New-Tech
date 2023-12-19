@@ -108,8 +108,42 @@ const instructorController = {
             res.status(500).json({ error: 'Đã xảy ra lỗi trong quá trình xử lý yêu cầu.' });
           }
     },
+    // Giáo viên xác nhận hướng dẫn đề tài
+    confirmdissertation : async (req, res) => {
+        const { decision } = req.body; // decision có thể là 'accept' hoặc 'reject'
+    
+        try {
+            const guidance = await Guidance.findById(req.params.guidanceId);
+    
+            if (!guidance) {
+                return res.status(404).json({ message: 'Hướng dẫn không tồn tại.' });
+            }
+    
+            // Xác nhận hoặc từ chối đề tài
+            if (decision === 'accept') {
+                guidance.status = 'Accepted';
+            } else if (decision === 'reject') {
+                guidance.status = 'Rejected';
+            } else {
+                return res.status(400).json({ message: 'Decision không hợp lệ.' });
+            }
+    
+            guidance.isConfirmed = true;
+    
+            await guidance.save();
+    
+            const confirmationMessage =
+                decision === 'accept' ? 'Đề tài đã được xác nhận.' : 'Đề tài đã bị từ chối.';
+    
+            return res.status(200).json({ message: confirmationMessage });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Đã xảy ra lỗi trong quá trình xử lý.' });
+        }
+    },
+    
     //Trưởng bộ môn xét duyệt
-    confirmdissertation: async (req, res) => {
+    TBMconfirmdissertation: async (req, res) => {
         const guidanceID = req.params.guidanceID;
         const isConfirmed = req.body.isConfirmed; // isConfirmed: true hoặc false
 
@@ -145,5 +179,6 @@ const instructorController = {
             }
     }   
 };
+
 
 module.exports = instructorController;

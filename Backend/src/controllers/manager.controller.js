@@ -3,6 +3,8 @@ const Student = require('../models/student.model');
 const Instructor = require('../models/instructor.model');
 const Dissertation = require('../models/dissertation.model');
 const mongoose = require('mongoose');
+const Specialization = require('../models/specialization.model');
+const RegistrationPeriod = require('../models/registrationPeriod.model');
 
 const managerController = {
 
@@ -299,46 +301,210 @@ const managerController = {
   
   
 
-  updateDissertation : async (req, res) => {
-    try {
-        const dissertationID = req.params.dissertationID; // Lấy dissertationID từ URL
-        const updateData = req.body;
+        updateDissertation : async (req, res) => {
+            try {
+                const dissertationID = req.params.dissertationID; // Lấy dissertationID từ URL
+                const updateData = req.body;
 
-        // Kiểm tra xem đề tài có tồn tại không
-        const existingDissertation = await Dissertation.findById(dissertationID);
+                // Kiểm tra xem đề tài có tồn tại không
+                const existingDissertation = await Dissertation.findById(dissertationID);
 
-        if (!existingDissertation) {
-            return res.status(404).json({ error: 'Đề tài không tồn tại.' });
+                if (!existingDissertation) {
+                    return res.status(404).json({ error: 'Đề tài không tồn tại.' });
+                }
+
+                // Cập nhật thông tin đề tài
+                Object.assign(existingDissertation, updateData);
+                await existingDissertation.save();
+
+                res.status(200).json(existingDissertation);
+            } catch (error) {
+                console.error('Lỗi khi cập nhật đề tài:', error);
+                res.status(500).json({ message: 'Lỗi máy chủ ~ updateDissertation' });
+            }
+        },
+        deleteDissertation : async (req, res) => {
+        try {
+            const deletedDissertation = await Dissertation.findOneAndDelete({ _id: req.params.dissertationID });
+            if (deletedDissertation) {
+                res.json({ success: true, message: 'Deleted successfully!' });
+            } else {
+                res.status(404).json({ success: false, message: 'Deleted fail! Dissertation not found.' });
+            }
+        } catch (error) {
+            console.error('Error in deleteDissertation:', error);
+            res.status(500).json({ message: 'Server error ~ deleteDissertation' });
         }
+        },
 
-        // Cập nhật thông tin đề tài
-        Object.assign(existingDissertation, updateData);
-        await existingDissertation.save();
 
-        res.status(200).json(existingDissertation);
-    } catch (error) {
-        console.error('Lỗi khi cập nhật đề tài:', error);
-        res.status(500).json({ message: 'Lỗi máy chủ ~ updateDissertation' });
-    }
-},
-deleteDissertation : async (req, res) => {
-  try {
-    const deletedDissertation = await Dissertation.findOneAndDelete({ _id: req.params.dissertationID });
-    if (deletedDissertation) {
-        res.json({ success: true, message: 'Deleted successfully!' });
-    } else {
-        res.status(404).json({ success: false, message: 'Deleted fail! Dissertation not found.' });
-    }
-} catch (error) {
-    console.error('Error in deleteDissertation:', error);
-    res.status(500).json({ message: 'Server error ~ deleteDissertation' });
-}
-}
+        //Quản lý chuyên ngành
+        addnewspecialization: async (req, res) => {
+            try {
+                const { name, description } = req.body;
+        
+                // Kiểm tra xem chuyên ngành có tồn tại chưa
+                const existingSpecialization = await Specialization.findOne({ name });
+                if (existingSpecialization) {
+                    return res.status(400).json({ error: 'Chuyên ngành đã tồn tại.' });
+                }
+        
+                // Tạo chuyên ngành mới
+                const newSpecialization = new Specialization({ name, description });
+                await newSpecialization.save();
+        
+                return res.status(201).json({ success: 'Chuyên ngành đã được thêm thành công.' });
+            } catch (error) {
+                console.error(error);
+                res.status(500).json({ error: 'Đã xảy ra lỗi trong quá trình xử lý.' });
+            }
+        
+        },
 
+        editspecialization: async (req, res) => {
+            try {
+                const specializationId = req.params.id;
+                const { name, description } = req.body;
+        
+                // Kiểm tra xem chuyên ngành có tồn tại chưa
+                const specialization = await Specialization.findById(specializationId);
+                if (!specialization) {
+                    return res.status(404).json({ error: 'Chuyên ngành không tồn tại.' });
+                }
+        
+                // Kiểm tra xem có chuyên ngành khác có cùng tên không (trừ chính nó)
+                const existingSpecialization = await Specialization.findOne({ name, _id: { $ne: specializationId } });
+                if (existingSpecialization) {
+                    return res.status(400).json({ error: 'Chuyên ngành đã tồn tại.' });
+                }
+        
+                // Cập nhật thông tin chuyên ngành
+                specialization.name = name;
+                specialization.description = description;
+        
+                await specialization.save();
+        
+                return res.status(200).json({ success: 'Chuyên ngành đã được cập nhật thành công.' });
+            } catch (error) {
+                console.error(error);
+                res.status(500).json({ error: 'Đã xảy ra lỗi trong quá trình xử lý.' });
+            }
+        },
+        deletespecialization: async (req, res) => {
+            try {
+                const specializationId = req.params.id;
+        
+                // Kiểm tra xem chuyên ngành có tồn tại chưa
+                const specialization = await Specialization.findById(specializationId);
+                if (!specialization) {
+                    return res.status(404).json({ error: 'Chuyên ngành không tồn tại.' });
+                }
+        
+                // Xóa chuyên ngành
+                await specialization.deleteOne();
+        
+                return res.status(200).json({ success: 'Chuyên ngành đã được xóa thành công.' });
+            } catch (error) {
+                console.error(error);
+                res.status(500).json({ error: 'Đã xảy ra lỗi trong quá trình xử lý.' });
+            }
+        },
+        getspecialization: async (req, res) => {
+            try {
+                const specializationId = req.params.id;
+        
+                // Kiểm tra xem chuyên ngành có tồn tại chưa
+                const specialization = await Specialization.findById(specializationId);
+                if (!specialization) {S
+                    return res.status(404).json({ error: 'Chuyên ngành không tồn tại.' });
+                }
+        
+                // Trả về thông tin chuyên ngành
+                return res.status(200).json({ specialization });
+            } catch (error) {
+                console.error(error);
+                res.status(500).json({ error: 'Đã xảy ra lỗi trong quá trình xử lý.' });
+            }
+        },
+
+        //Quản lý đợt đăng kí đề tài
+        getallregistrationperiod: async (req, res) => {
+            try {
+                const registrationPeriods = await RegistrationPeriod.find();
+                return res.status(200).json({ registrationPeriods });
+            } catch (error) {
+                console.error(error);
+                res.status(500).json({ error: 'Đã xảy ra lỗi trong quá trình xử lý.' });
+            }
+        },
+
+        
+        addregistrationperiod: async (req, res) => {
+            try {
+                const { name, startDate, endDate, semesterNumber } = req.body;
+        
+                // Tạo đợt đăng ký đề tài mới
+                const newRegistrationPeriod = new RegistrationPeriod({ name, startDate, endDate, semesterNumber });
+                await newRegistrationPeriod.save();
+        
+                return res.status(201).json({ success: 'Đợt đăng ký đề tài mới đã được thêm thành công.' });
+            } catch (error) {
+                console.error(error);
+                res.status(500).json({ error: 'Đã xảy ra lỗi trong quá trình xử lý.' });
+            }
+        },
+
+        editregistrationperiod: async (req, res) => {
+            try {
+                const { name, startDate, endDate, semesterNumber } = req.body;
+                const registrationPeriodId = req.params.id;
+        
+                // Tìm đợt đăng ký đề tài theo ID
+                const registrationPeriod = await RegistrationPeriod.findById(registrationPeriodId);
+        
+                // Kiểm tra xem đợt đăng ký đề tài có tồn tại không
+                if (!registrationPeriod) {
+                    return res.status(404).json({ error: 'Đợt đăng ký đề tài không tồn tại.' });
+                }
+        
+                // Cập nhật thông tin đợt đăng ký đề tài
+                registrationPeriod.name = name;
+                registrationPeriod.startDate = startDate;
+                registrationPeriod.endDate = endDate;
+                registrationPeriod.semesterNumber = semesterNumber;
+        
+                // Lưu thay đổi vào cơ sở dữ liệu
+                await registrationPeriod.save();
+        
+                return res.status(200).json({ success: 'Thông tin đợt đăng ký đề tài đã được cập nhật thành công.' });
+            } catch (error) {
+                console.error(error);
+                res.status(500).json({ error: 'Đã xảy ra lỗi trong quá trình xử lý.' });
+            }
+        },
+
+        
+        deleteregistrationperiod:async (req, res) => {
+            try {
+                const registrationPeriodId = req.params.id;
+        
+                // Tìm đợt đăng ký đề tài theo ID
+                const registrationPeriod = await RegistrationPeriod.findById(registrationPeriodId);
+        
+                // Kiểm tra xem đợt đăng ký đề tài có tồn tại không
+                if (!registrationPeriod) {
+                    return res.status(404).json({ error: 'Đợt đăng ký đề tài không tồn tại.' });
+                }
+                // Xóa đợt đăng ký đề tài
+                await registrationPeriod.deleteOne();
+        
+                return res.status(200).json({ success: 'Đợt đăng ký đề tài đã được xóa thành công.' });
+            } catch (error) {
+                console.error(error);
+                res.status(500).json({ error: 'Đã xảy ra lỗi trong quá trình xử lý.' });
+            }
+        },
 };
-
-
-
 
 
 

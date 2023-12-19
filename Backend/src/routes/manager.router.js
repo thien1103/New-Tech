@@ -39,4 +39,14 @@ router.put('/update-dissertation/:dissertationID', managercontroller.updateDisse
 
 router.delete('/delete-dissertation/:dissertationID', managercontroller.deleteDissertation);
 
+///Quản lý chuyên ngành
+router.post('/add-specialization',managercontroller.addnewspecialization);
+router.put('/edit-specialization/:id',managercontroller.editspecialization);
+router.delete('/delete-specialization/:id',managercontroller.deletespecialization);
+router.get('/specialization/:id',managercontroller.getspecialization);
+//Quản lý đơt đăng kí đê tài
+router.post('/add-registration-period',managercontroller.addregistrationperiod);
+router.put('/edit-registration-period/:id',managercontroller.editregistrationperiod);
+router.delete('/delete-registration-period/:id',managercontroller.deleteregistrationperiod);
+router.get('/all-registration-periods',managercontroller.getallregistrationperiod);
 module.exports = router;

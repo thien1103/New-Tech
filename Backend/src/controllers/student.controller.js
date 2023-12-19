@@ -99,13 +99,21 @@ const studentController = {
 
             // Đăng ký đề tài cho sinh viên
             const guidance = new Guidance({
-                student: studentId,
-                dissertation: dissertationId,
+                student: student._id,
+                instructor: dissertation.instructor, // Assuming the dissertation has an instructor
+                dissertation: dissertation._id,
+                status: 'Pending',
+            });
+            await guidance.save();
+            // Thêm hướng dẫn vào mảng registeredDissertations của sinh viên
+            student.registeredDissertations.push({
+                dissertation: guidance._id,
+                status: 'Chờ xét duyệt',
             });
 
             await guidance.save();
 
-            res.status(200).json({ success: 'Đăng ký đề tài thành công.' });
+            res.status(200).json({ success: 'Đăng ký đề tài thành công.Chờ xét duyệt' });
         } catch (error) {
             console.error(error);
             res.status(500).json({ error: 'Đã xảy ra lỗi trong quá trình xử lý.' });
