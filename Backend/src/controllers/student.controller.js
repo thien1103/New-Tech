@@ -84,36 +84,38 @@ const studentController = {
             const dissertation = await Dissertation.findById(dissertationId);
 
             if (!student || !dissertation) {
-                return res.status(404).json({ error: 'Sinh viên hoặc đề tài không tồn tại.' });
+            return res.status(404).json({ error: 'Sinh viên hoặc đề tài không tồn tại.' });
             }
 
             // Kiểm tra xem sinh viên đã đăng ký đề tài này chưa
             const isRegistered = await Guidance.findOne({
-                student: studentId,
-                dissertation: dissertationId
+            student: studentId,
+            dissertation: dissertationId
             });
 
             if (isRegistered) {
-                return res.status(400).json({ error: 'Sinh viên đã đăng ký đề tài này.' });
+            return res.status(400).json({ error: 'Sinh viên đã đăng ký đề tài này.' });
             }
 
             // Đăng ký đề tài cho sinh viên
             const guidance = new Guidance({
-                student: student._id,
-                instructor: dissertation.instructor, // Assuming the dissertation has an instructor
-                dissertation: dissertation._id,
-                status: 'Pending',
+            student: student._id,
+            instructor: dissertation.instructor,
+            dissertation: dissertation._id,
+            status: 'Pending',
             });
+
             await guidance.save();
+
             // Thêm hướng dẫn vào mảng registeredDissertations của sinh viên
             student.registeredDissertations.push({
-                dissertation: guidance._id,
-                status: 'Chờ xét duyệt',
+            dissertation: guidance._id,
+            status: 'Chờ xét duyệt',
             });
 
-            await guidance.save();
+            await student.save();
 
-            res.status(200).json({ success: 'Đăng ký đề tài thành công.Chờ xét duyệt' });
+            res.status(200).json({ success: 'Đăng ký đề tài thành công. Chờ xét duyệt' });
         } catch (error) {
             console.error(error);
             res.status(500).json({ error: 'Đã xảy ra lỗi trong quá trình xử lý.' });

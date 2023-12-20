@@ -10,10 +10,10 @@ router.put('/update-instructor/:instructorId', instructorController.updateProfil
 router.get('/instructor/guidance-dissertations/available', instructorController.viewRegisteredStudents);
 
 // Đăng ký hướng dẫn đề tài cho sinh viên
-router.post('/register-guidance/:instructorId/:studentId/:dissertationId', instructorController.registerToGuideDissertation);
+router.post('/instructors/:instructorId/dissertations', instructorController.createDissertation);
 
 // TBM
-router.post('/heads-of-department/confirm-dissertation/:guidanceID', instructorController.TBMconfirmdissertation);
+router.post('/department-heads/dissertations/:dissertationId', instructorController.approveDissertation);
 // giáo viên xác nhận hướng dân đề tài
 router.post('/instructors/process-dissertation/:guidanceId', instructorController.confirmdissertation);
 

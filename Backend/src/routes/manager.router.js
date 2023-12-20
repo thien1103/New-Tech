@@ -14,31 +14,22 @@ router.put('/:id', managercontroller.updateManager);
 
 
 router.delete('/:id', managercontroller.deleteManager);
-
+//Quản lý student
 router.get('/getstudents/:stc', managercontroller.getAllStudentbystcode)
-
 router.post("/poststudents/create", managercontroller.createStudent);
-
 router.put("/putstudents/update/:id", managercontroller.updateStudent);
-
 router.delete("/deletestudents/delete/:id", managercontroller.deleteStudent);
 
+//Quản lý instructor
 router.get('/getinstructors', managercontroller.getAllInstructors);
-
 router.get('/getinstructors/:id', managercontroller.getInstructorById);
-
 router.post('/postinstructors/create', managercontroller.createInstructor);
-
 router.put('/putinstructors/update/:id', managercontroller.updateInstructor);
-
 router.delete("/deleteInstructor/delete/:id", managercontroller.deleteInstructor);
-
+//Quản lý đề tài
 router.post("/postDissertation/create", managercontroller.createDissertation);
-
-router.put('/update-dissertation/:dissertationID', managercontroller.updateDissertation);
-
-router.delete('/delete-dissertation/:dissertationID', managercontroller.deleteDissertation);
-
+router.put('/update-dissertation/:id', managercontroller.updateDissertation);
+router.delete('/delete-dissertation/:id', managercontroller.deleteDissertation);
 ///Quản lý chuyên ngành
 router.post('/add-specialization',managercontroller.addnewspecialization);
 router.put('/edit-specialization/:id',managercontroller.editspecialization);
