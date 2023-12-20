@@ -27,7 +27,8 @@ const instructorSchema = new mongoose.Schema({
         default: false
     },
     specialization: {
-        type: String
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Specialization',
     },
     guidanceDissertations: {
         type: mongoose.Schema.Types.ObjectId,

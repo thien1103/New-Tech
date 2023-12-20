@@ -25,6 +25,26 @@ const guidanceSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
+    task: {
+        title: String,
+        description: String,
+        deadline: Date,
+        completion: {
+            type: Number,
+            default: 0, // Giá trị mặc định là 0%, có thể thay đổi tùy thuộc vào logic của bạn
+        },
+        instructionsFile: String,
+        documentUrl: {
+            type: String,
+            validate: {
+                validator: function (value) {
+                    // Validate that the file has a GIF extension
+                    return /\.(gif)$/i.test(value);
+                },
+                message: 'Only GIF files are allowed.',
+            },
+        },
+    },
    
 });
 

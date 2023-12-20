@@ -3,6 +3,8 @@ const Instructor = require('../models/instructor.model');
 const Guidance = require('../models/guidance.model');
 const Dissertation = require('../models/dissertation.model');
 const Student = require('../models/student.model');
+const RegistrationPeriod = require('../models/registrationPeriod.model'); //
+
 
 const instructorController = {
     getProfileInstructor: async (req, res) => {
@@ -22,7 +24,6 @@ const instructorController = {
             res.status(500).json({ error: 'Đã xảy ra lỗi trong quá trình xử lý.' });
         }
     },
-
     updateProfileInstructor: async (req, res) => {
         const instructorId = req.params.instructorId;
         const { phone, email } = req.body;
@@ -51,50 +52,6 @@ const instructorController = {
             res.status(500).json({ error: 'Đã xảy ra lỗi trong quá trình xử lý.' });
         }
     },
-    
-    
-
-    // Đăng ký hướng dẫn đề tài cho sinh viên
-    registerToGuideDissertation: async (req, res) => {
-        const instructorId = req.params.instructorId;
-        const studentId = req.params.studentId;
-        const dissertationId = req.params.dissertationId;
-
-        try {
-            // Kiểm tra xem giảng viên, sinh viên và đề tài có tồn tại không
-            const instructor = await Instructor.findById(instructorId);
-            const student = await Student.findById(studentId);
-            const dissertation = await Dissertation.findById(dissertationId);
-
-            if (!instructor || !student || !dissertation) {
-                return res.status(404).json({ error: 'Giảng viên, sinh viên hoặc đề tài không tồn tại.' });
-            }
-
-            // Kiểm tra xem đã tồn tại mối quan hệ hướng dẫn này chưa
-            const existingGuidance = await Guidance.findOne({ instructor: instructorId, student: studentId, dissertation: dissertationId });
-
-            if (existingGuidance) {
-                return res.status(400).json({ error: 'Mối quan hệ hướng dẫn đã tồn tại.' });
-            }
-
-            // Tạo mối quan hệ hướng dẫn mới
-            const guidance = new Guidance({
-                instructor: instructorId,
-                student: studentId,
-                dissertation: dissertationId,
-                // Các trường khác nếu cần thiết
-                // ...
-            });
-
-            await guidance.save();
-
-            res.status(200).json({ success: 'Đăng ký hướng dẫn đề tài thành công.' });
-        } catch (error) {
-            console.error(error);
-            res.status(500).json({ error: 'Đã xảy ra lỗi trong quá trình xử lý.' });
-        }
-    },
-
     viewRegisteredStudents: async (req, res) => {
         try {
             // Lấy danh sách các đăng ký trước từ Guidance
@@ -108,42 +65,175 @@ const instructorController = {
             res.status(500).json({ error: 'Đã xảy ra lỗi trong quá trình xử lý yêu cầu.' });
           }
     },
-    //Trưởng bộ môn xét duyệt
-    confirmdissertation: async (req, res) => {
-        const guidanceID = req.params.guidanceID;
-        const isConfirmed = req.body.isConfirmed; // isConfirmed: true hoặc false
 
-            try {
-                // Lấy thông tin hướng dẫn
-                const guidance = await Guidance.findById(guidanceID).populate('student').populate('instructor').populate('dissertation');
-                if (!guidance) {
-                    return res.status(404).json({ error: 'Không tìm thấy thông tin đăng ký.' });
-                }
-
-                // Kiểm tra xem đề tài đã được xác nhận hoặc từ chối trước đó
-                if (guidance.isConfirmed) {
-                    return res.status(400).json({ error: 'Đề tài này đã được xác nhận hoặc từ chối trước đó.' });
-                }
-
-                // Cập nhật trạng thái xác nhận của đề tài
-                guidance.isConfirmed = isConfirmed;
-                await guidance.save();
-
-                // Cập nhật trạng thái 'status' trong đối tượng dissertation của hướng dẫn
-                if (isConfirmed) {
-                    guidance.dissertation.Status = 'Accepted';
-                    await guidance.dissertation.save();
-                }
-
-                // Gửi thông báo sau khi xác nhận hoặc từ chối đề tài
-                const confirmationMessage = 'Xác nhận đề tài thành công.';
-                
-                res.json({ success: true, message: confirmationMessage });
-            } catch (error) {
-                console.error(error);
-                res.status(500).json({ error: 'Đã xảy ra lỗi trong quá trình xử lý yêu cầu.', detail: error.message });
+    createDissertation : async (req, res) => {
+        try {
+          const instructorId = req.params.instructorId;
+          const dissertationData = req.body;
+          const registrationPeriodId = req.body.registrationPeriodId;
+          const specializationIds = req.body.specializationIds;
+      
+          const instructor = await Instructor.findById(instructorId);
+          if (!instructor) {
+            return res.status(404).json({ error: 'Giáo viên không tồn tại.' });
+          }
+      
+          const registrationPeriod = await RegistrationPeriod.findById(registrationPeriodId);
+          if (!registrationPeriod) {
+            return res.status(404).json({ error: 'Đợt đăng ký không tồn tại.' });
+          }
+      
+          const dissertation = new Dissertation({
+            ...dissertationData,
+            InstructorID: instructorId,
+            RegistrationPeriodID: registrationPeriodId,
+            specializationID: specializationIds,
+            isInstructorAccept: true, // Giả sử giáo viên tự đăng ký đề tài và chấp nhận luôn
+            Status: 'Pending', // Sửa lại thành 'PendingApproval' để chờ xét duyệt
+          });
+          await dissertation.save();
+      
+          res.status(201).json(dissertation);
+        } catch (error) {
+          console.error(error);
+          res.status(500).json({ error: 'Đã xảy ra lỗi trong quá trình xử lý.' });
+        }
+      },
+    // Giáo viên xác nhận hướng dẫn đề tài
+    confirmdissertation : async (req, res) => {
+        const { decision } = req.body; // decision có thể là 'accept' hoặc 'reject'
+    
+        try {
+            const guidance = await Guidance.findById(req.params.guidanceId);
+    
+            if (!guidance) {
+                return res.status(404).json({ message: 'Hướng dẫn không tồn tại.' });
             }
-    }   
+    
+            // Xác nhận hoặc từ chối đề tài
+            if (decision === 'accept') {
+                guidance.status = 'Accepted';
+            } else if (decision === 'reject') {
+                guidance.status = 'Rejected';
+            } else {
+                return res.status(400).json({ message: 'Decision không hợp lệ.' });
+            }
+    
+            guidance.isConfirmed = true;
+    
+            await guidance.save();
+    
+            const confirmationMessage =
+                decision === 'accept' ? 'Đề tài đã được xác nhận.' : 'Đề tài đã bị từ chối.';
+    
+            return res.status(200).json({ message: confirmationMessage });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Đã xảy ra lỗi trong quá trình xử lý.' });
+        }
+    },
+    
+    //Trưởng bộ môn xét duyệt
+    approveDissertation : async (req, res) => {
+        const { decision } = req.body; // decision có thể là 'accept' hoặc 'reject'
+    
+        try {
+            const dissertation = await Dissertation.findById(req.params.dissertationId);
+    
+            if (!dissertation) {
+                return res.status(404).json({ message: 'Đề tài không tồn tại.' });
+            }
+    
+            // Xác nhận hoặc từ chối đề tài
+            if (decision === 'accept') {
+                dissertation.Status = 'Accepted';
+            } else if (decision === 'reject') {
+                dissertation.Status = 'Rejected';
+            } else {
+                return res.status(400).json({ message: 'Decision không hợp lệ.' });
+            }
+    
+            dissertation.isConfirmed = true;
+    
+            await dissertation.save();
+    
+            const confirmationMessage =
+                decision === 'accept' ? 'Đề tài đã được xác nhận.' : 'Đề tài đã bị từ chối.';
+    
+            return res.status(200).json({ message: confirmationMessage });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Đã xảy ra lỗi trong quá trình xử lý.' });
+        }
+    },
+    //Phân giáo viên phản biện
+    assignreviewer: async (req, res) => {
+        try {
+            const { dissertationId, instructorIds } = req.params;
+        
+            const dissertation = await Dissertation.findById(dissertationId);
+        
+            if (!dissertation) {
+              return res.status(404).json({ message: 'Không tìm thấy đề tài.' });
+            }
+        
+            const maxReviewers = 3;
+            const instructorsToAdd = JSON.parse(instructorIds).slice(0, maxReviewers);
+        
+            instructorsToAdd.forEach(instructorId => {
+              dissertation.defenseReview.push({
+                assignedInstructorID: instructorId,
+                comments: '',
+              });
+            });
+        
+            await dissertation.save();
+        
+            return res.status(200).json({ message: 'Phân giáo viên phản biện thành công.' });
+          } catch (error) {
+            console.error(error);
+            return res.status(500).json({ message: 'Đã xảy ra lỗi.' });
+          }
+      },
+      createTaskForStudent : async (req, res) => {
+        try {
+            const { instructorId, studentId, dissertationId } = req.params;
+            const { title, description, deadline, instructionsFile } = req.body;
+    
+            // Kiểm tra xem đã có hướng dẫn cho đối tượng này chưa
+            let guidance = await Guidance.findOne({
+                instructor: instructorId,
+                student: studentId,
+                dissertation: dissertationId,
+            });
+    
+            // Nếu chưa có, tạo mới
+            if (!guidance) {
+                guidance = await Guidance.create({
+                    instructor: instructorId,
+                    student: studentId,
+                    dissertation: dissertationId,
+                });
+            }
+    
+            // Thêm task vào đối tượng Guidance
+            guidance.task = {
+                title,
+                description,
+                deadline,
+                instructionsFile,
+            };
+    
+            await guidance.save();
+    
+            res.status(201).json(guidance);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: 'Error creating task for student.' });
+        }
+    }
+      
 };
+
 
 module.exports = instructorController;
