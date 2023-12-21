@@ -2,8 +2,10 @@ const mongoose = require('mongoose');
 
 
 const studentSchema = new mongoose.Schema({
+  
     studentID:{
         type: Number,
+    
     },
 
     name: {
@@ -40,10 +42,16 @@ const studentSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
-    // Mảng các ID của đề tài mà sinh viên đã đăng ký
     registeredDissertations: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Guidance',
+        dissertation: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Guidance',
+        },
+        status: {
+            type: String,
+            enum: ['Chờ xét duyệt', 'Đã xét duyệt', 'Từ chối'],
+            default: 'Chờ xét duyệt',
+        },
     }],
 
 });

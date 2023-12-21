@@ -9,7 +9,7 @@ const dissertationSchema = new mongoose.Schema({
     },
     Name: {
         type: String,
-        required: true,
+        
     },
     Description: {
         type: String,
@@ -22,6 +22,14 @@ const dissertationSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Instructor',
     },
+    specializationID: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Specialization',
+    }],
+    RegistrationPeriodID: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'RegistrationPeriod',
+    },
     CouncilID: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Council',
@@ -30,13 +38,26 @@ const dissertationSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
-    Duration: {
-        type: Date,
-    },
     Status: {
         type: String,
         enum: ['Pending', 'Accepted', 'Rejected', 'InProgress', 'Completed'],
     },
+    departmentHeadApproval: {
+        type: Boolean,
+        default: false,
+    },
+    departmentHeadComment: {
+        type: String,
+    },
+    defenseReview: [{
+        assignedInstructorID: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Instructor',
+        },
+        comments: {
+            type: String,
+        },
+    }],
 
     
 },{ limit: false });

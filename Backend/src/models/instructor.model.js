@@ -22,12 +22,9 @@ const instructorSchema = new mongoose.Schema({
     phone: {
         type: String
     },
-    isAccept: {
-        type: Boolean,
-        default: false
-    },
     specialization: {
-        type: String
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Specialization',
     },
     guidanceDissertations: {
         type: mongoose.Schema.Types.ObjectId,
