@@ -8,48 +8,50 @@ const path = require('path');
 const studentController = {
 
 
+    
+
     getProfileStudents : async (req, res) => {
-        const studentId = req.params.studentId;
-
-    try {
-        // Kiểm tra xem sinh viên có tồn tại không
-        const student = await Student.findById(studentId);
-
-        if (!student) {
-            return res.status(404).json({ error: 'Sinh viên không tồn tại.' });
-        }
-
-        res.status(200).json(student);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Đã xảy ra lỗi trong quá trình xử lý.' });
-    }
+        try {
+            const studentID = req.params.studentID;
+            
+            // Sử dụng Mongoose để tìm instructor theo instructorID
+            const student = await Student.findOne({ studentID });
+        
+            if (!student) {
+              return res.status(404).json({ error: 'Instructor not found' });
+            }
+        
+            // Trả về thông tin hồ sơ instructor nếu tìm thấy
+            res.json({ student });
+          } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: 'Internal Server Error' });
+          }
     },
 
     updateProfileStudent: async (req, res) => {
-        const studentId = req.params.studentId;
-    const { address, phone, email } = req.body;
+        const studentID = req.params.studentID;
+        const updateData = req.body; // Assuming the updated data is sent in the request body
 
-    try {
-        // Kiểm tra xem sinh viên có tồn tại không
-        const student = await Student.findById(studentId);
+        try {
+            // Find the student by studentID
+            const student = await Student.findOne({ studentID });
 
-        if (!student) {
-            return res.status(404).json({ error: 'Sinh viên không tồn tại.' });
+            if (!student) {
+                return res.status(404).json({ message: 'Student not found' });
+            }
+
+            // Update the student's profile
+            Object.assign(student, updateData);
+
+            // Save the updated student document
+            await student.save();
+
+            res.status(200).json({ message: 'Profile updated successfully', updatedProfile: student });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Internal Server Error' });
         }
-
-        // Cập nhật thông tin cá nhân
-        if (address) student.address = address;
-        if (phone) student.phone = phone;
-        if (email) student.email = email;
-
-        await student.save();
-
-        res.status(200).json({ success: 'Cập nhật thông tin cá nhân thành công.' });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Đã xảy ra lỗi trong quá trình xử lý.' });
-    }
     },
     //Xem tất cả các đề tài chưa đc đăng kí
     availabledissertations: async (req, res) => {
