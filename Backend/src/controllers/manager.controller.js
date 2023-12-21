@@ -269,14 +269,14 @@ const managerController = {
     // manager dissertation//
     createDissertation: async (req, res) => {
         try {
-            const { Name, Description,dissertationID, instructorId, specializationId, registrationPeriodId } = req.body;
+            const { Name, Description,dissertationID, instructorId, specializationId  } = req.body;
     
             // Kiểm tra xem giáo viên, chuyên ngành và kì đăng ký có tồn tại không
             const instructor = await Instructor.findById(instructorId);
             const specialization = await Specialization.findById(specializationId);
-            const registrationPeriod = await RegistrationPeriod.findById(registrationPeriodId);
+            
     
-            if (!instructor || !specialization || !registrationPeriod) {
+            if (!instructor || !specialization ) {
                 return res.status(400).json({ success: false, message: 'Giáo viên, chuyên ngành hoặc kì đăng ký không tồn tại!' });
             }
     
@@ -287,7 +287,7 @@ const managerController = {
                 dissertationID,
                 InstructorID: instructorId,
                 specializationID: specializationId,
-                RegistrationPeriodID: registrationPeriodId,
+            
             });
     
             await newDissertation.save();

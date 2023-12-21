@@ -4,52 +4,70 @@ const Guidance = require('../models/guidance.model');
 const Dissertation = require('../models/dissertation.model');
 const Student = require('../models/student.model');
 const RegistrationPeriod = require('../models/registrationPeriod.model'); //
+const Specialization = require('../models/specialization.model'); // Replace with the actual model for Specialization
 
 
 const instructorController = {
-    getProfileInstructor: async (req, res) => {
-        const instructorId = req.params.instructorId;
 
+    getSpecializationNameById: async (req, res) => {
         try {
-            // Check if the instructor exists
-            const instructor = await Instructor.findById(instructorId);
-
-            if (!instructor) {
-                return res.status(404).json({ error: 'Giảng viên không tồn tại.' });
-            }
-
-            res.status(200).json(instructor);
+          const specializationId = req.params.specializationId;
+    
+          // Use Mongoose to find specialization by ID
+          const specialization = await Specialization.findById(specializationId);
+    
+          if (!specialization) {
+            return res.status(404).json({ error: 'Specialization not found' });
+          }
+    
+          // Return specialization name
+          res.json({ specializationName: specialization.name });
         } catch (error) {
-            console.error(error);
-            res.status(500).json({ error: 'Đã xảy ra lỗi trong quá trình xử lý.' });
+          console.error(error);
+          res.status(500).json({ error: 'Internal Server Error' });
         }
+      },
+
+    getProfileInstructor: async (req, res) => {
+        try {
+            const instructorID = req.params.instructorID;
+            
+            // Sử dụng Mongoose để tìm instructor theo instructorID
+            const instructor = await Instructor.findOne({ instructorID });
+        
+            if (!instructor) {
+              return res.status(404).json({ error: 'Instructor not found' });
+            }
+        
+            // Trả về thông tin hồ sơ instructor nếu tìm thấy
+            res.json({ instructor });
+          } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: 'Internal Server Error' });
+          }
     },
     updateProfileInstructor: async (req, res) => {
-        const instructorId = req.params.instructorId;
-        const { phone, email } = req.body;
-    
+        const { instructorID } = req.params; // Đây là ID của instructor cần cập nhật
+        const updatedProfile = req.body; // Dữ liệu cập nhật từ người dùng
+
         try {
-            // Check if the instructor exists
-            const instructor = await Instructor.findById(instructorId);
-    
+            // Tìm instructor theo ID
+            const instructor = await Instructor.findOne({ instructorID });
+
             if (!instructor) {
-                return res.status(404).json({ error: 'Giảng viên không tồn tại.' });
+            return res.status(404).json({ message: 'Instructor not found' });
             }
-    
-            // Update personal information
-            if (phone) instructor.phone = phone;
-            if (email) instructor.email = email;
-    
-            // Save changes to the database
+
+            // Cập nhật thông tin hồ sơ
+            Object.assign(instructor, updatedProfile);
+
+            // Lưu thông tin cập nhật vào database
             await instructor.save();
-    
-            // Log the updated instructor object for debugging
-            console.log('Updated Instructor:', instructor);
-    
-            res.status(200).json({ success: 'Cập nhật thông tin cá nhân thành công.' });
+
+            return res.status(200).json({ message: 'Profile updated successfully', instructor });
         } catch (error) {
-            console.error('Error updating instructor:', error);
-            res.status(500).json({ error: 'Đã xảy ra lỗi trong quá trình xử lý.' });
+            console.error(error);
+            return res.status(500).json({ message: 'Internal Server Error' });
         }
     },
     viewRegisteredStudents: async (req, res) => {
@@ -70,7 +88,6 @@ const instructorController = {
         try {
           const instructorId = req.params.instructorId;
           const dissertationData = req.body;
-          const registrationPeriodId = req.body.registrationPeriodId;
           const specializationIds = req.body.specializationIds;
       
           const instructor = await Instructor.findById(instructorId);
@@ -78,15 +95,10 @@ const instructorController = {
             return res.status(404).json({ error: 'Giáo viên không tồn tại.' });
           }
       
-          const registrationPeriod = await RegistrationPeriod.findById(registrationPeriodId);
-          if (!registrationPeriod) {
-            return res.status(404).json({ error: 'Đợt đăng ký không tồn tại.' });
-          }
       
           const dissertation = new Dissertation({
             ...dissertationData,
             InstructorID: instructorId,
-            RegistrationPeriodID: registrationPeriodId,
             specializationID: specializationIds,
             isInstructorAccept: true, // Giả sử giáo viên tự đăng ký đề tài và chấp nhận luôn
             Status: 'Pending', // Sửa lại thành 'PendingApproval' để chờ xét duyệt
