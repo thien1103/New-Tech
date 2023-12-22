@@ -3,7 +3,10 @@ const mongoose = require('mongoose');
 
 const accountSchema = new mongoose.Schema({
     accountID: {
-        type: Number,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "student",
+        ref: "instructor",
+        ref: "manager",
         required: true,
         unique: true
     },

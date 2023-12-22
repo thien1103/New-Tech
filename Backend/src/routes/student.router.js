@@ -3,10 +3,10 @@ const router = express.Router();
 const studentController = require('../controllers/student.controller');
 
 //Show thông tin student
-router.get('/students/:studentID', studentController.getProfileStudents);
+router.get('/students/:studentId', studentController.getProfileStudents);
 //Edit profile
 
-router.put('/editprofile/:studentID', studentController.updateProfileStudent);
+router.put('/editprofile/:studentId', studentController.updateProfileStudent);
 
 //Xem đề tài chưa đăng kí
 router.get('/student/available-dissertations',studentController.availabledissertations);

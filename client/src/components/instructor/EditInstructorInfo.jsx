@@ -9,8 +9,8 @@ const EditInstructorInfo = ({ instructorID, bg }) => {
 
   useEffect(() => {
     // Fetch student information from the backend API
-    const instructorID = '1';
-  
+    const user = JSON.parse(localStorage.getItem('user'));
+    const instructorID = user.id;
     const fetchInstructorInfo = async () => {
       try {
         const response = await axios.get(`http://localhost:8000/instructors/instructors/${instructorID}`);
@@ -19,8 +19,9 @@ const EditInstructorInfo = ({ instructorID, bg }) => {
 
         // Fetch specialization name
         const specializationId = instructorData.specialization;
+        console.log(specializationId);
         if (specializationId) {
-          const specializationResponse = await axios.get(`http://localhost:8000/instructors/instructor/getinstructorbyid/${specializationId}`);
+          const specializationResponse = await axios.get(`http://localhost:8000/instructors/getSpecializationById/${specializationId}`);
           const specializationData = specializationResponse.data;
           setInstructorInfo(prevState => ({
             ...prevState,
@@ -42,9 +43,10 @@ const EditInstructorInfo = ({ instructorID, bg }) => {
 
   const handleSave = async () => {
     try {
-      const instructorID = '1';
+      const user = JSON.parse(localStorage.getItem('user'));
+      const instructorID = user.id;
       const values = await form.validateFields();
-      const response = await axios.put(`http://localhost:8000/instructors/instructors/update-instructor/${instructorID}`, values);
+      const response = await axios.put(`http://localhost:8000/instructors/update-instructor/${instructorID}`, values);
       if (response.status === 200) {
         message.success("Update Successfully");
       } 

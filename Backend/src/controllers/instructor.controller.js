@@ -39,46 +39,46 @@ const instructorController = {
       },
 
     getProfileInstructor: async (req, res) => {
-        try {
-            const instructorID = req.params.instructorID;
-            
-            // Sử dụng Mongoose để tìm instructor theo instructorID
-            const instructor = await Instructor.findOne({ instructorID });
-        
-            if (!instructor) {
-              return res.status(404).json({ error: 'Instructor not found' });
-            }
-        
-            // Trả về thông tin hồ sơ instructor nếu tìm thấy
-            res.json({ instructor });
-          } catch (error) {
-            console.error(error);
-            res.status(500).json({ error: 'Internal Server Error' });
-          }
+      try {
+        const instructorId = req.params.instructorId;
+    
+        // Sử dụng Mongoose để tìm instructor theo instructorID
+        const instructor = await Instructor.findById(instructorId);
+    
+        if (!instructor) {
+          return res.status(404).json({ error: 'Instructor not found' });
+        }
+    
+        // Trả về thông tin hồ sơ instructor nếu tìm thấy
+        res.json({ instructor });
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+      }
     },
     updateProfileInstructor: async (req, res) => {
-        const { instructorID } = req.params; // Đây là ID của instructor cần cập nhật
-        const updatedProfile = req.body; // Dữ liệu cập nhật từ người dùng
-
-        try {
-            // Tìm instructor theo ID
-            const instructor = await Instructor.findOne({ instructorID });
-
-            if (!instructor) {
-            return res.status(404).json({ message: 'Instructor not found' });
-            }
-
-            // Cập nhật thông tin hồ sơ
-            Object.assign(instructor, updatedProfile);
-
-            // Lưu thông tin cập nhật vào database
-            await instructor.save();
-
-            return res.status(200).json({ message: 'Profile updated successfully', instructor });
-        } catch (error) {
-            console.error(error);
-            return res.status(500).json({ message: 'Internal Server Error' });
+      const { instructorId } = req.params; // Đây là ID của instructor cần cập nhật
+      const updatedProfile = req.body; // Dữ liệu cập nhật từ người dùng
+    
+      try {
+        // Tìm instructor theo ID
+        const instructor = await Instructor.findById(instructorId);
+    
+        if (!instructor) {
+          return res.status(404).json({ message: 'Instructor not found' });
         }
+    
+        // Cập nhật thông tin hồ sơ
+        Object.assign(instructor, updatedProfile);
+    
+        // Lưu thông tin cập nhật vào database
+        await instructor.save();
+    
+        return res.status(200).json({ message: 'Profile updated successfully', instructor });
+      } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Internal Server Error' });
+      }
     },
     viewRegisteredStudents: async (req, res) => {
         try {

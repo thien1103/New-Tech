@@ -1,14 +1,16 @@
 import { useState, useEffect } from "react";
 import { Button, Form, Input, Image } from "antd";
 import axios from "axios";
+import TeacherImg from "../../assets/teacher.png"
 
 const InstructorInfo = ({ instructorID, bg }) => {
   const [instructorInfo, setInstructorInfo] = useState({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const instructorID = '1';
-  
+    
+    const user = JSON.parse(localStorage.getItem('user'));
+    const instructorID = user.id;
     const fetchInstructorInfo = async () => {
       try {
         const response = await axios.get(`http://localhost:8000/instructors/instructors/${instructorID}`);
@@ -17,9 +19,10 @@ const InstructorInfo = ({ instructorID, bg }) => {
 
         // Fetch specialization name
         const specializationId = instructorData.specialization;
+        console.log(specializationId);
         if (specializationId) {
 
-          const specializationResponse = await axios.get(`http://localhost:8000/instructors/instructor/getSpecializationById/${specializationId}`);
+          const specializationResponse = await axios.get(`http://localhost:8000/instructors/getSpecializationById/${specializationId}`);
 
           const specializationData = specializationResponse.data;
           setInstructorInfo(prevState => ({
@@ -43,7 +46,7 @@ const InstructorInfo = ({ instructorID, bg }) => {
     
     <div className="flex flex-col" style={{ padding: 24, minHeight: 360, background: bg, justifyContent: "center", alignItems: "center" }}>
       <div className="flex flex-col">
-        <p className="font-bold text-3xl">Student Information</p>
+        <p className="font-bold text-3xl">Instructor Information</p>
         <div className="mb-2 pb-2 border-b-[1px] border-black border-solid"></div>
         <div className="grid grid-cols-3 gap-4">
           <div>

@@ -3,7 +3,7 @@ const router = express.Router();
 const instructorController = require('../controllers/instructor.controller');
 
 
-router.get('/instructors/:instructorID', instructorController.getProfileInstructor);
+router.get('/instructors/:instructorId', instructorController.getProfileInstructor);
 
 router.put('/update-instructor/:instructorId', instructorController.updateProfileInstructor);
 

@@ -17,10 +17,13 @@ const SelectTopic = ({ bg }) => {
 
       const updatedData = await Promise.all(
         availableDissertationsResponse.data.map(async (item, index) => {
+
           const instructor = await fetchInstructorName(item.InstructorID);
           const assignedInstructorIDs = item.defenseReview.map(
             (review) => review.assignedInstructorID
+            
           );
+          console.log(assignedInstructorIDs)
           const assignedInstructors = await fetchAssignedInstructorName(
             assignedInstructorIDs
           );
@@ -52,9 +55,11 @@ const SelectTopic = ({ bg }) => {
     }
   };
 
-  const studentID = "2";     ///////////////////Khoa đổi ID chỗ này bằng local storage, dùng field studentID
+  
   const fetchStudentInfo = async () => {
     try {
+      const user = JSON.parse(localStorage.getItem('user'));
+      const studentID = user.id;
       const response = await axios.get(
         `http://localhost:8000/students/students/${studentID}`
       );
