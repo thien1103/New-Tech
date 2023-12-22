@@ -54,7 +54,7 @@ const UserPage = () => {
   const siderItems = [
     getItem("Thông tin sinh viên", "user-account", <UserOutlined />),
     getItem("Đăng kí đề tài", "select-thesis", <UserOutlined />),
-    getItem("Quản lí đề tài", "manage-thesis", <UserOutlined />),
+    // getItem("Quản lí đề tài", "manage-thesis", <UserOutlined />),
     // getItem("", "5", <FileOutlined />),
   ];
   const onClick = ({ key }) => {

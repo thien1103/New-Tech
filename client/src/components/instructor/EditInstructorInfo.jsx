@@ -72,7 +72,7 @@ const EditInstructorInfo = ({ instructorID, bg }) => {
         <div className="mb-2 pb-2 border-b-[1px] border-black border-solid"></div>
         <div className="grid grid-cols-3 gap-4 ">
           <div>
-            <Image width={300} height={400} src="https://gw.alipayobjects.com/zos/antfincdn/LlvErxo8H9/photo-1503185912284-5271ff81b9a8.webp" />
+            <Image width={300} height={400} src="https://static.tuoitre.vn/tto/i/s626/2015/09/22/vo-su-nguyen-van-dung-1442885937.jpg?fbclid=IwAR2mln6cV4WcLmurwRrLfg1Jb-c3L-e2_xtlTQyAhSMFAr1lq1ugXOi6n4g" />
           </div>
           <div>
             <Form

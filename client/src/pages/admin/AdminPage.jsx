@@ -55,8 +55,7 @@ const AdminPage = () => {
   const siderItems = [
     getItem("Quản lý Tài Khoản", "account-management", <ToolOutlined />),
     getItem("Quản Lý Đề Tài", "thesis-management", <ContainerOutlined />),
-    getItem("Quản lý Chuyên Ngành", "major-management", <UserOutlined />),
-    getItem("Quản lý Niên Khóa", "course-management", <TeamOutlined />),
+    getItem("Quản lý Chuyên Ngành", "major-management", <UserOutlined />)
    // getItem("Quản lý đợt đăng kí đề tài", "create-account", <UserAddOutlined />),
 
     // getItem("", "5", <FileOutlined />),

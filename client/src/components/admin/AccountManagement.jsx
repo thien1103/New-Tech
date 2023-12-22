@@ -59,7 +59,7 @@ const AccountManagement = (props) => {
       const values = form.getFieldValue();
       console.log("Data to be sent:", values);
       setLoading(true);
-      const studentID = '658541fb897465cfc94dcae5'
+      const studentID = '658617c9a71e3704cdd57900'
 
       const response = await axios.put(
         `http://localhost:8000/managers/putstudents/update/${studentID}`,values

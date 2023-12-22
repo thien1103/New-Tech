@@ -128,6 +128,7 @@ const InstructorAccount = (props) => {
 
       for (const instructorData of instructors) {
         const specializationId = instructorData.specialization;
+        console.log(specializationId, "HELLO")
         try {
           const specializationResponse = await axios.get(`http://localhost:8000/instructors/getSpecializationById/${specializationId}`);
           const specializationData = specializationResponse.data;
