@@ -12,11 +12,13 @@ import { Avatar } from "antd";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import logoSideBar from "/src/assets/logo2.png" ;
 const { Header, Content, Footer, Sider } = Layout;
+import authService from "../../services/auth.service";
 
 const InstructorPage = () => {
   const navigate = useNavigate();
   const handleLogout = () => {
     navigate("/");
+    authService.logout();
   };
 
   const location = useLocation();
