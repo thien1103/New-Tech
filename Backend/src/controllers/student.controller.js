@@ -141,9 +141,8 @@ const studentController = {
 
         try {
             // Kiểm tra xem sinh viên và đề tài có tồn tại không
-            const student = await Student.findById(studentId);
-            const dissertation = await Dissertation.findById(dissertationId);
-
+            const student = await Student.findById({ _id: studentId });
+            const dissertation = await Dissertation.findById({ _id: dissertationId });
             if (!student || !dissertation) {
             return res.status(404).json({ error: 'Sinh viên hoặc đề tài không tồn tại.' });
             }
@@ -161,7 +160,7 @@ const studentController = {
             // Đăng ký đề tài cho sinh viên
             const guidance = new Guidance({
             student: student._id,
-            instructor: dissertation.instructor,
+            instructor: dissertation.InstructorID,
             dissertation: dissertation._id,
             status: 'Pending',
             });
