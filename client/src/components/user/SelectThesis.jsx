@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Table, Button } from "antd";
+import { Table, Button, message } from "antd";
 import axios from "axios";
 
 const SelectTopic = ({ bg }) => {
@@ -14,7 +14,7 @@ const SelectTopic = ({ bg }) => {
       const availableDissertationsResponse = await axios.get(
         "http://localhost:8000/students/student/available-dissertations"
       );
-  
+
       const updatedData = await Promise.all(
         availableDissertationsResponse.data.map(async (item, index) => {
           const instructor = await fetchInstructorName(item.InstructorID);
@@ -24,7 +24,10 @@ const SelectTopic = ({ bg }) => {
           const assignedInstructors = await fetchAssignedInstructorName(
             assignedInstructorIDs
           );
-          const specialization = await fetchSpecializationName(item.specializationID);
+          const specialization = await fetchSpecializationName(
+            item.specializationID
+          );
+          const student = await fetchStudentInfo();
           return {
             key: index,
             thesisID: item.dissertationID,
@@ -33,13 +36,32 @@ const SelectTopic = ({ bg }) => {
             instructor: instructor.instructorName || "",
             assignedInstructors: assignedInstructors || [],
             specialization: specialization.specializationName || "",
+            studentId: student.student._id || "", // Placeholder for student ID
+            instructorId: item.InstructorID || "", // Placeholder for instructor ID
+            dissertationId: item._id || "", // Placeholder for dissertation ID
+ 
           };
+          
         })
+        
       );
-  
+        
       setData(updatedData);
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  const studentID = "2";     ///////////////////Khoa đổi ID chỗ này bằng local storage, dùng field studentID
+  const fetchStudentInfo = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8000/students/students/${studentID}`
+      );
+      return response.data || {}; // Return the object directly
+    } catch (error) {
+      console.error(error);
+      return {};
     }
   };
 
@@ -48,7 +70,6 @@ const SelectTopic = ({ bg }) => {
       const response = await axios.get(
         `http://localhost:8000/students/getInstructorNameById/${InstructorID}`
       );
-      console.log(response.data);
       return response.data || {}; // Return the object directly
     } catch (error) {
       console.error(error);
@@ -57,33 +78,63 @@ const SelectTopic = ({ bg }) => {
   };
 
   const fetchAssignedInstructorName = async (assignedInstructorIDs) => {
-  try {
-    const instructorNames = await Promise.all(
-      assignedInstructorIDs.map(async (id) => {
-        const response = await axios.get(
-          `http://localhost:8000/students/getInstructorNameById/${id}`
-        );
-        return response.data.instructorName || "";
-      })
-    );
-    console.log(instructorNames);
-    return instructorNames;
-  } catch (error) {
-    console.error(error);
-    return [];
-  }
-};
+    try {
+      const instructorNames = await Promise.all(
+        assignedInstructorIDs.map(async (id) => {
+          const response = await axios.get(
+            `http://localhost:8000/students/getInstructorNameById/${id}`
+          );
+          return response.data.instructorName || "";
+        })
+      );
+      return instructorNames;
+    } catch (error) {
+      console.error(error);
+      return [];
+    }
+  };
 
   const fetchSpecializationName = async (specializationId) => {
     try {
       const response = await axios.get(
         `http://localhost:8000/instructors/getSpecializationById/${specializationId}`
       );
-      console.log(response.data);
       return response.data || {}; // Return the object directly
     } catch (error) {
       console.error(error);
       return {};
+    }
+  };
+
+  const handleRegister = async (studentId, instructorId, dissertationId) => {
+    try {
+      const requestData = {
+        studentId,
+        instructorId,
+        dissertationId,
+      };
+
+      console.log("Data sent to API:", requestData);
+
+      const response = await axios.post(
+        `http://localhost:8000/students/students/${studentId}/dissertations/${dissertationId}/register`,
+        requestData
+      );
+
+      if (response.status === 200) {
+        console.log("Đăng ký đề tài thành công. Chờ xét duyệt");
+        // Handle success case
+        message.success("Successfully register disseratation");
+      } else {
+        console.error("Failed to register dissertation");
+        // Handle error case
+        message.error("Fail to register disseratation");
+
+      }
+    } catch (error) {
+      console.error("Error in registering dissertation:", error);
+      message.error("Fail to register disseratation");
+      // Handle error case
     }
   };
 
@@ -123,40 +174,38 @@ const SelectTopic = ({ bg }) => {
       dataIndex: "assignedInstructors",
       key: "assignedInstructors",
       align: "center",
-      render: (assignedInstructors) => {
-        return (
-          <div>
-            {assignedInstructors.map((instructor, index) => (
-              <div key={index}>{instructor}</div>
-            ))}
-          </div>
-        );
-      },
+      render: (assignedInstructors) => (
+        <ul>
+          {assignedInstructors.map((instructor, index) => (
+            <li key={index}>{instructor}</li>
+          ))}
+        </ul>
+      ),
     },
     {
-      title: "Đăng kí",
-      dataIndex: "register",
-      key: "register",
+      title: "Action",
+      key: "action",
       align: "center",
-      width: 100,
-      render: (_, record) => {
-        
-          return (
-            <div className="flex justify-center">
-              <Button className="mr-2" type="default" onClick={() => {}}>
-                Đăng kí
-              </Button>
-            </div>
-          );
-      },
+      render: (text, record) => (
+        <Button
+          type="primary"
+          onClick={() =>
+            handleRegister(
+              record.studentId,
+              record.instructorId,
+              record.dissertationId
+            )
+          }
+        >
+          Đăng Kí
+        </Button>
+      ),
     },
   ];
 
   return (
-    <div style={{ padding: 24, minHeight: 360, background: bg }}>
-      <div>
-        <Table dataSource={data} columns={columns} bordered />
-      </div>
+    <div>
+      <Table columns={columns} dataSource={data} bordered />
     </div>
   );
 };
