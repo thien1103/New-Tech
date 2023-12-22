@@ -223,6 +223,7 @@ const managerController = {
 
     createInstructor: async (req, res) => {
         try {
+
             const { instructorID, name, email, password, phone, specializationId } = req.body;
 
             // Check if the specialization exists
@@ -247,6 +248,7 @@ const managerController = {
         } catch (error) {
             console.error('Error in creating Instructor:', error);
             res.status(500).json({ success: false, message: 'Server error ~ createInstructor' });
+
         }
     },
 
@@ -280,14 +282,20 @@ const managerController = {
     // manager dissertation//
     createDissertation: async (req, res) => {
         try {
-            const { Name, Description, dissertationID, instructorId, specializationId, registrationPeriodId } = req.body;
 
+
+            const { Name, Description,dissertationID, instructorId, specializationId  } = req.body;
+
+    
             // Kiểm tra xem giáo viên, chuyên ngành và kì đăng ký có tồn tại không
             const instructor = await Instructor.findById(instructorId);
             const specialization = await Specialization.findById(specializationId);
-            const registrationPeriod = await RegistrationPeriod.findById(registrationPeriodId);
 
-            if (!instructor || !specialization || !registrationPeriod) {
+            
+    
+            if (!instructor || !specialization ) {
+
+
                 return res.status(400).json({ success: false, message: 'Giáo viên, chuyên ngành hoặc kì đăng ký không tồn tại!' });
             }
 
@@ -298,7 +306,7 @@ const managerController = {
                 dissertationID,
                 InstructorID: instructorId,
                 specializationID: specializationId,
-                RegistrationPeriodID: registrationPeriodId,
+
             });
 
             await newDissertation.save();
@@ -308,10 +316,56 @@ const managerController = {
             return res.status(500).json({ success: false, message: 'Server error ~ createDissertation' });
         }
     },
-    updateDissertation: async (req, res) => {
-        try {
-            const { Name, Description, dissertationID, instructorId, specializationId, registrationPeriodId } = req.body;
-            const dissertationId = req.params.id;
+
+        updateDissertation : async (req, res) => {
+            try {
+                const { Name, Description, dissertationID, instructorId, specializationId, registrationPeriodId } = req.body;
+                const dissertationId = req.params.id;
+        
+                // Kiểm tra xem đề tài có tồn tại không
+                console.log(dissertationId)
+                const dissertation = await Dissertation.findById(dissertationId);
+                
+                if (!dissertation) {
+
+
+                    return res.status(404).json({ error: 'Đề tài không tồn tại' });
+                }
+        
+                // Cập nhật thông tin đề tài
+                const updatedDissertation = await Dissertation.findByIdAndUpdate(
+                    req.params.id,
+                    {
+                        Name,
+                        Description,
+                        dissertationID,
+                        InstructorID: instructorId,
+                        specializationID: specializationId,
+                        RegistrationPeriodID: registrationPeriodId,
+                    },
+                    { new: true }
+                );
+        
+                return res.json({ success: true, message: 'Cập nhật đề tài thành công', updatedDissertation });
+            } catch (error) {
+                console.error('Error updating dissertation:', error);
+                return res.status(500).json({ success: false, message: 'Server error ~ updateDissertation' });
+            }
+        },
+        deleteDissertation : async (req, res) => {
+            try {
+                const deletedDissertation = await Dissertation.findByIdAndDelete(req.params.id);
+                if (deletedDissertation) {
+                    res.json({ success: true, message: 'Xóa đề tài thành công!' });
+                } else {
+                    res.status(404).json({ success: false, message: 'Không tìm thấy đề tài để xóa!' });
+                }
+            } catch (error) {
+                console.error('Error in deleting Dissertation:', error);
+                res.status(500).json({ success: false, message: 'Lỗi server ~ deleteDissertation' });
+            }
+        },
+
 
             // Kiểm tra xem đề tài có tồn tại không
             console.log(dissertationId)
@@ -321,6 +375,7 @@ const managerController = {
 
                 return res.status(404).json({ error: 'Đề tài không tồn tại' });
             }
+
 
             // Cập nhật thông tin đề tài
             const updatedDissertation = await Dissertation.findByIdAndUpdate(
@@ -349,6 +404,29 @@ const managerController = {
                 res.json({ success: true, message: 'Xóa đề tài thành công!' });
             } else {
                 res.status(404).json({ success: false, message: 'Không tìm thấy đề tài để xóa!' });
+
+        },
+    
+
+        addnewspecialization: async (req, res) => {
+            try {
+                const { name, description } = req.body;
+        
+                // Kiểm tra xem chuyên ngành có tồn tại chưa
+                const existingSpecialization = await Specialization.findOne({ name });
+                if (existingSpecialization) {
+                    return res.status(400).json({ error: 'Chuyên ngành đã tồn tại.' });
+                }
+        
+                // Tạo chuyên ngành mới
+                const newSpecialization = new Specialization({ name, description });
+                await newSpecialization.save();
+        
+                return res.status(201).json({ success: 'Chuyên ngành đã được thêm thành công.' });
+            } catch (error) {
+                console.error(error);
+                res.status(500).json({ error: 'Đã xảy ra lỗi trong quá trình xử lý.' });
+
             }
         } catch (error) {
             console.error('Error in deleting Dissertation:', error);

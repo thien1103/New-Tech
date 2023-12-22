@@ -1,13 +1,16 @@
 const Student = require('../models/student.model');
 const Dissertation = require('../models/dissertation.model');
 const Guidance = require('../models/guidance.model');
+
 const Instructor = require('../models/instructor.model');
 const multer = require('multer');
 const path = require('path');
 const Specialization = require('../models/specialization.model');
 
 
+
 const studentController = {
+
 
 
     getInstructorNameById: async (req, res) => {
@@ -47,6 +50,7 @@ const studentController = {
           res.status(500).json({ error: 'Internal Server Error' });
         }
       },
+
 
     getProfileStudents : async (req, res) => {
         try {

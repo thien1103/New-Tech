@@ -18,7 +18,9 @@ const InstructorInfo = ({ instructorID, bg }) => {
         // Fetch specialization name
         const specializationId = instructorData.specialization;
         if (specializationId) {
+
           const specializationResponse = await axios.get(`http://localhost:8000/instructors/instructor/getSpecializationById/${specializationId}`);
+
           const specializationData = specializationResponse.data;
           setInstructorInfo(prevState => ({
             ...prevState,

@@ -21,7 +21,9 @@ router.put("/putstudents/update/:id", managercontroller.updateStudent);
 router.delete("/deletestudents/delete/:id", managercontroller.deleteStudent);
 
 //Quản lý instructor
+
 router.get('/getallinstructors', managercontroller.getAllInstructors);
+
 router.get('/getinstructors/:id', managercontroller.getInstructorById);
 router.post('/postinstructors/create', managercontroller.createInstructor);
 router.put('/putinstructors/update/:id', managercontroller.updateInstructor);
@@ -35,7 +37,9 @@ router.post('/add-specialization',managercontroller.addnewspecialization);
 router.put('/edit-specialization/:id',managercontroller.editspecialization);
 router.delete('/delete-specialization/:id',managercontroller.deletespecialization);
 router.get('/specialization/:id',managercontroller.getspecialization);
+
 router.get('/getAllSpecializations/',managercontroller.getAllSpecialization);
+
 
 //Quản lý đơt đăng kí đê tài
 router.post('/add-registration-period',managercontroller.addregistrationperiod);

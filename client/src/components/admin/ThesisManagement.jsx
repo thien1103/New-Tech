@@ -7,13 +7,14 @@ import {
   Form,
   Input,
   Row,
-
+  Select,
   Table,
 
 } from "antd";
 import { EyeOutlined, FileAddOutlined,  } from "@ant-design/icons";
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
+const { Option } = Select;
 const DescriptionItem = ({ title, content }) => (
   <div className=" mb-[7px] text-[14px] leading-[1.5715] ">
     <p className=" inline-block mr-[8px]">{title}:</p>
@@ -181,10 +182,26 @@ const handleAdd = () => {
                 <div>
                     <Form className="mt-10">
                         <Form.Item>
-                            <span>something here</span>
+                            <span>Tên đề tài</span>
+                            <Input/>
+                            <span>Mô tả</span>
+                            <Input/>
+                            <span>Chọn giáo viên hướng dẫn</span>
+                            <Select defaultValue="" className="mt-1">
+                                <Option value="nguyenVanA">Nguyen Van A</Option>
+                                <Option value="nguyenVanB">Nguyen Van B</Option>
+                                <Option value="nguyenVanC">Nguyen Van C</Option>
+                            </Select>
+                            <span>Chọn chuyên ngành</span>
+                            <Select defaultValue="" className="mt-1">
+                                <Option value="nguyenVanA">Nguyen Van A</Option>
+                                <Option value="nguyenVanB">Nguyen Van B</Option>
+                                <Option value="nguyenVanC">Nguyen Van C</Option>
+                            </Select>
+                            <span>Thời gian thực hiện</span>
                             <Input/>
                             <Button
-                                className="justify-center align-center flex bg-green-700 text-white hover:!text-white hover:!border-none max-w-max top-40 left-40 relative"
+                                className="justify-center align-center flex bg-green-700 text-white hover:!  text-white hover:!border-none max-w-max top-40 left-40 relative"
                                 onClick={() => {}}
                             >
                                 <span>

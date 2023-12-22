@@ -1,4 +1,5 @@
-const mongoose = require('mongoose');
+    const mongoose = require('mongoose');
+
 
 
 const instructorSchema = new mongoose.Schema({
@@ -33,6 +34,7 @@ const instructorSchema = new mongoose.Schema({
 });
 
 
-const Instructor = mongoose.model('Instructor', instructorSchema);
 
-module.exports = Instructor;
+    const Instructor = mongoose.model('Instructor', instructorSchema);
+
+    module.exports = Instructor;

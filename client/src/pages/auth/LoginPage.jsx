@@ -1,28 +1,35 @@
 import { Button, Form, Input, message } from "antd";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import AuthService from '../../services/auth.service';
 
 const LoginPage = () => {
   const navigate = useNavigate();
 
   const onFinish = async (values) => {
     try {
-      const response = await axios.post("http://localhost:8000/auth/login", values);
+      const username = values.username;
+      const password = values.password;
+      console.log(username);
+      console.log(password);
+      const response = await AuthService.login(username,password);
+      console.log(response);
 
-      if (response.status === 200) {
-        const { token, user, userType } = response.data;
+      if (response) {
+        console.log("Hello")
+        const userRole = response.roles[0];
         // Redirect to the desired page based on user type
-        if (userType === "manager") {
+        if (userRole === "ROLE_MANAGER") {
           navigate("/admin");
           message.success("Login successfully");
-        } else if (userType === "student") {
+        } else if (userRole === "ROLE_STUDENT") {
           navigate("/user");
           message.success("Login successfully");
-        } else if (userType === "instructor") {
+        } else if (userRole === "ROLE_INSTRUCTOR" || userRole === "ROLE_HEADINSTRUCTOR") {
           navigate("/instructor");
           message.success("Login successfully");
         }
-      } else if (response.status === 401) {
+      } else if (!response) {
         console.error("Login failed");
         // Handle login failure, show error message, etc.
         // You can use the Ant Design message component to display the error message
@@ -61,13 +68,13 @@ const LoginPage = () => {
           className=" flex flex-col gap-4"
         >
           <Form.Item
-            label="Email Address"
-            name="email"
+            label="Username"
+            name="username"
             style={{ width: "100%", fontSize: "16px" }}
             rules={[
               {
                 required: true,
-                message: "Please input your email address!",
+                message: "Please input your username",
               },
             ]}
           >

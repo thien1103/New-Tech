@@ -66,6 +66,7 @@ const UserInfo = ({ studentID, bg }) => {
             >
               <div className="grid grid-cols-3 gap-4">
                 <div>
+
                   <Form.Item label="Account ID" name="studentID" style={{ fontSize: "16px" }}>
                     <Input size="large" value={studentInfo.studentID} readOnly /> <div/>
                   </Form.Item>
@@ -75,10 +76,12 @@ const UserInfo = ({ studentID, bg }) => {
                   <Form.Item label="Email" name="email">
                     <Input size="large" name="email" onChange={handleInputChange} />
                   </Form.Item>
+
                 </div>
                 <div>
                   <Form.Item label="Phone" name="phone">
                     <Input size="large" name="phone" onChange={handleInputChange} />
+
                   </Form.Item>
                   <Form.Item label="Class" name="classs">
                     <Input size="large" name="classs" onChange={handleInputChange} />
