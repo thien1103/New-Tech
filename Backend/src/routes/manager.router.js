@@ -25,7 +25,7 @@ router.get('/getallinstructors', managercontroller.getAllInstructors);
 router.get('/getinstructors/:id', managercontroller.getInstructorById);
 router.post('/postinstructors/create', managercontroller.createInstructor);
 router.put('/putinstructors/update/:id', managercontroller.updateInstructor);
-router.delete("/deleteInstructor/delete/:id", managercontroller.deleteInstructor);
+router.delete("/deleteInstructor/delete/:instructorID", managercontroller.deleteInstructor);
 //Quản lý đề tài
 router.post("/postDissertation/create", managercontroller.createDissertation);
 router.put('/update-dissertation/:id', managercontroller.updateDissertation);
