@@ -97,6 +97,20 @@ const managerController = {
             res.status(500).json({ success: false, message: 'Lỗi server ~ getAllstudents' });
         }
     },
+
+    getStudentById: async (req, res) => {
+        try {
+            const student = await Student.findById(req.params.id);
+            if (student) {
+                res.json({ success: true, student });
+            } else {
+                res.status(404).json({ success: false, message: 'Không tìm thấy học sinh!' });
+            }
+        } catch (error) {
+            console.error('Error in getting Student information:', error);
+            res.status(500).json({ success: false, message: 'Lỗi server ~ getStudentById' });
+        }
+    },
   
 
 

@@ -49,7 +49,7 @@ const InstructorAccount = (props) => {
 
   const handleFormEdit = async () => {
     try {
-      const values = form.getFieldsValue();
+      const values = form.getFieldValue();
       console.log("Data to be sent:", values);
       setLoading(true);
   
