@@ -1,8 +1,9 @@
-import {Modal, Avatar,   Button,   Col,    Divider,   Drawer,   Form,   Input,  Row,Space, Table} from "antd";
+import {Modal, Avatar,   Button,  Col,    Divider, message,   Drawer,  DatePicker,  Form,   Input,  Row,Space, Table} from "antd";
   import { EyeOutlined, UserAddOutlined } from "@ant-design/icons";
   import dayjs from "dayjs";
-  import { useState } from "react";
+  import { useState, useEffect } from "react";
   import { useSearchParams } from "react-router-dom";
+  import axios from "axios";
   const DescriptionItem = ({ title, content }) => (
     <div className=" mb-[7px] text-[14px] leading-[1.5715] ">
       <p className=" inline-block mr-[8px]">{title}:</p>
@@ -13,6 +14,9 @@ import {Modal, Avatar,   Button,   Col,    Divider,   Drawer,   Form,   Input,  
     const { bg } = props;
     const [form] = Form.useForm();
     const [open, setOpen] = useState(false);
+    const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [isModalVisible, setIsModalVisible] = useState(false);
     const showDrawer = () => {
       setOpen(true);
     };
@@ -30,7 +34,64 @@ import {Modal, Avatar,   Button,   Col,    Divider,   Drawer,   Form,   Input,  
     // Show the edit modal
     openModal();
 };
-    const [isModalVisible, setIsModalVisible] = useState(false);
+const handleFormSubmit = async () => {
+  try {
+    const values = await form.getFieldsValue();
+    console.log("Data to be sent:", values);
+    setLoading(true);
+
+    const response = await axios.post(
+      "http://localhost:8000/managers/poststudents/create/",
+      values
+    );
+
+    if (response.status === 201) {
+      setLoading(false);
+      closeModal();
+      message.success("Student created successfully");
+      fetchData();
+    } else {
+      message.error("Failed to create Student");
+    }
+  } catch (error) {
+    console.error("Error in creating Student:", error);
+    if (
+      error.response &&
+      error.response.data &&
+      error.response.data.message
+    ) {
+      console.error("Backend error message:", error.response.data.message);
+    }
+    message.error("Failed to create student");
+  } finally {
+    setLoading(false);
+  }
+};
+    useEffect(() => {
+      fetchData();
+    }, []);
+
+
+
+    const fetchData = async () => {
+      try {
+        const response = await axios.get("http://localhost:8000/managers/getallStudents");
+        const students = response.data.students;
+    
+        const updatedData = students.map(studentData => {
+          const {  ...rest } = studentData;
+          return { ...rest };
+        });
+    
+        setData(updatedData);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+
+
+   
     const [searchParams, setSearchParams] = useSearchParams();
     const handleSearch = async (values) => {
       for (const key in values) {
@@ -48,47 +109,7 @@ import {Modal, Avatar,   Button,   Col,    Divider,   Drawer,   Form,   Input,  
       setSearchParams({});
       form.resetFields();
     };
-    const data = [
-      {
-        userAvatar:
-          "https://s3.ap-southeast-1.amazonaws.com/family.circle/avatar/AVATAR_tB5idnWvVj.jpg",
-        userFullName: "Nguyen Van A",
-        userEmail: "test@gmail.com",
-        phone: "0123456789",
-        dateOfBirth: "12/07/2002 10:06:06",
-        status: 1,
-        address: "123 Nguyen Van A",
-        city: "HCM",
-        country: "Viet Nam",
-  
-      },
-      {
-        userAvatar:
-          "https://s3.ap-southeast-1.amazonaws.com/family.circle/avatar/AVATAR_tB5idnWvVj.jpg",
-        userFullName: "Nguyen Van B",
-        userEmail: "test123@gmail.com",
-        phone: "0123456789",
-        dateOfBirth: "25/05/2002 10:06:06",
-        status: 3,
-        address: "123 Nguyen Van B",
-        city: "HCM",
-        country: "USA",
-  
-      },
-      {
-        userAvatar:
-          "https://s3.ap-southeast-1.amazonaws.com/family.circle/avatar/AVATAR_tB5idnWvVj.jpg",
-        userFullName: "Nguyen Van C",
-        userEmail: "test3333@gmail.com",
-        phone: "0123456789",
-        dateOfBirth: "07/07/2002 10:06:06",
-        status: 2,
-        address: "123 Nguyen Van C",
-        city: "Ha Noi",
-        country: "Viet Nam",
-  
-      },
-    ];
+    
     const columns = [
       {
         title: "Avatar",
@@ -105,47 +126,50 @@ import {Modal, Avatar,   Button,   Col,    Divider,   Drawer,   Form,   Input,  
       },
       {
         title: "ID",
-        dataIndex: "userAccountID",
-        key: "userAccountID",
+        dataIndex: "studentID",
+        key: "studentID",
         align: "center",
       },
       {
         title: "Full name",
-        dataIndex: "userFullName",
-        key: "userFullName",
+        dataIndex: "name",
+        key: "name",
+        align: "center",
+      },
+      {
+        title: "StudentCode",
+        dataIndex: "studentCode",
+        key: "studentCode",
         align: "center",
       },
       {
         title: "Email",
-        dataIndex: "userEmail",
-        key: "userEmail",
+        dataIndex: "email",
+        key: "email",
         align: "center",
       },
       {
-        title: "Phone",
+        title: "Phone Number",
         dataIndex: "phone",
         key: "phone",
         align: "center",
       },
-      {
-        title: "Address",
-        dataIndex: "address",
-        key: "address",
-        align: "center",
-      },
+      
       {
         title: "Class",
-        dataIndex: "class",
-        key: "class",
+        dataIndex: "classs",
+        key: "classs",
         align: "center",
       },
       {
         title: "Date of birth",
-        dataIndex: "dateOfBirth",
-        key: "dateOfBirth",
+        dataIndex: "birthday",
+        key: "birthday",
         align: "center",
         render: (_, record) =>
-          record.dateOfBirth && dayjs("12/07/2002 10:06:06").format("DD/MM/YYYY"),
+        <span>
+        {record.birthday && dayjs(record.birthday).format("DD/MM/YYYY")}
+      </span>
       },
       /***{
         title: "Reputation",
@@ -210,7 +234,7 @@ import {Modal, Avatar,   Button,   Col,    Divider,   Drawer,   Form,   Input,  
       >
         <div className=" mb-2 pb-2 border-b-[1px] border-black border-solid">
           <Form layout="inline" onFinish={handleSearch} form={form}>
-            <Form.Item label="Name" name="fullName">
+            <Form.Item label="name" name="fullName">
               <Input defaultValue={searchParams.get("fullName")}></Input>
             </Form.Item>
             <Form.Item label="ID" name="ID">
@@ -230,7 +254,7 @@ import {Modal, Avatar,   Button,   Col,    Divider,   Drawer,   Form,   Input,  
           </Form>
         </div>
         <div className="">
-          <Table dataSource={data} columns={columns} bordered></Table>
+          <Table dataSource={data} columns={columns} bordered rowKey="studentID"></Table>
           <Button
         className="justify-center align-center flex bg-green-700 text-white hover:!text-white hover:!border-none max-w-max"
         onClick={() => handleAdd()}
@@ -336,20 +360,44 @@ import {Modal, Avatar,   Button,   Col,    Divider,   Drawer,   Form,   Input,  
                 }}
             >
                 <div>
-                    <Form className="mt-10">
-                        <Form.Item>
-                            <span>something here</span>
-                              <Input/>
+                    <Form className="mt-10" form={form} onFinish={handleFormSubmit}>
+                    <Form.Item name="studentID" label="Student ID">
+                    <Input />
+                  </Form.Item>
+                  <Form.Item name="name" label="Student Name">
+                    <Input />
+                  </Form.Item>
+                  <Form.Item name="studentCode" label="Student Code">
+                    <Input />
+                  </Form.Item>
+                  <Form.Item name="email" label="Email">
+                    <Input />
+                  </Form.Item>
+                  <Form.Item name="phone" label="Phone Number">
+                    <Input />
+                  </Form.Item>
+                  <Form.Item name="classs" label="Class">
+                    <Input />
+                  </Form.Item>
+                  <Form.Item name="birthday" label="Date of birth">
+                      <DatePicker
+                        
+                      />
+                    </Form.Item>
+                  <Form.Item name="password" label="Password">
+                    <Input.Password />
+                  </Form.Item>
                             
                             <Button
-                                className="justify-center align-center flex bg-green-700 text-white hover:!text-white hover:!border-none max-w-max top-40 left-40 relative"
-                                onClick={() => {}}
+                                className="justify-center align-center flex bg-green-700 text-white hover:!text-white hover:!border-none max-w-max top-3 left-40 relative"
+                                onClick={() => handleFormSubmit()}
+                                loading={loading}
                             >
                                 <span>
                                    Xác nhận
                                 </span>
                             </Button>
-                        </Form.Item>
+                       
                     </Form>
                 </div>
             </Modal>

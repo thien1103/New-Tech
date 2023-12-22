@@ -23,6 +23,9 @@ const studentSchema = new mongoose.Schema({
         sparse: true,
         unique: true,
     },
+    birthday:{
+        type: Date,
+    },
     password: {
         type: String,
     },
