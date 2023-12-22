@@ -21,6 +21,24 @@ const managerController = {
             return res.status(500).json({ message: 'Lỗi server' });
         }
     },
+    getInstructorNameById: async (req, res) => {
+        try {
+          const instructorId = req.params.instructorId;
+    
+          // Use Mongoose to find specialization by ID
+          const instructor = await Instructor.findById(instructorId);
+    
+          if (!instructor) {
+            return res.status(404).json({ error: 'Instructor not found' });
+          }
+    
+          // Return specialization name
+          res.json({ instructorName: instructor.name });
+        } catch (error) {
+          console.error(error);
+          res.status(500).json({ error: 'Internal Server Error' });
+        }
+      },
 
     createManager: async (req, res) => {
         try {
@@ -60,16 +78,27 @@ const managerController = {
     },
 
     // funtion students
-    getAllStudentbystcode: async (req, res) => {
+   getAllStudentbystcode: async (req, res) => {
+      try {
+        const StudentDetail = await Student.find({ _studentCode: req.params.studentCode });
+        res.json({ StudentDetail });
+      } catch (error) {
+        res
+          .status(500)
+          .json({ success: false, message: "Server error ~ getStudentDetail" });
+      }
+  },
+    getAllStudents: async (req, res) => {
         try {
-            const StudentDetail = await Student.find({ _studentCode: req.params.studentCode });
-            res.json({ StudentDetail });
+            const students = await Student.find();
+            res.json({ success: true, students });
         } catch (error) {
-            res
-                .status(500)
-                .json({ success: false, message: "Server error ~ getStudentDetail" });
+            console.error('Error fetching students:', error);
+            res.status(500).json({ success: false, message: 'Lỗi server ~ getAllstudents' });
         }
     },
+  
+
 
     updateStudent: async (req, res) => {
         try {
@@ -91,60 +120,32 @@ const managerController = {
 
 
     createStudent: async (req, res) => {
-        const session = await mongoose.startSession();
-        session.startTransaction();
-
         try {
-            const {
-                studentID,
-                name,
-                studentCode,
-                birthday,
-                gender,
-                email,
-                phone,
-                classs,
-                departemt,
-            } = req.body;
 
-            // Tìm kiếm sinh viên theo studentCode
-            const existingStudent = await Student.findOne({ studentCode });
-
-            // Kiểm tra xem sinh viên đã tồn tại hay chưa
+            const { studentID, studentCode,name, email,birthday, password, phone, classs } = req.body;
+        
+     
+           // Check if the student exists
+            const existingStudent = await Student.findOne({ studentID: studentID });
             if (existingStudent) {
-                throw new Error("Sinh viên đã tồn tại!");
+            return res.status(400).json({ success: false, message: 'Student already exists' });
             }
-
-            // Tạo một đối tượng Student mới
+        
+            // Create a new instructor with the specialization
             const newStudent = new Student({
-                studentID,
-                name,
-                studentCode,
-                birthday,
-                email,
-                gender,
-                phone,
-                departemt,
-                classs,
+                studentID, studentCode,name, email,birthday, password, phone, classs
             });
-
-            // Lưu sinh viên mới vào cơ sở dữ liệu
+        
             await newStudent.save();
-
-            await session.commitTransaction();
-            session.endSession();
-
-            console.log("Sinh viên đã được tạo mới thành công");
-            return res.status(201).json(newStudent);
-        } catch (error) {
-            await session.abortTransaction();
-            session.endSession();
-
-            console.log(error);
-            res.status(500).json({ message: error.message });
-        }
-    },
-
+            console.log('Created successfully');
+            res.status(201).json({ success: true, newStudent });
+          } catch (error) {
+            console.error('Error in creating Student:', error);
+            res.status(500).json({ success: false, message: 'Server error ~ createStudent' });
+  
+          }
+  },
+  
 
     deleteStudent: async (req, res) => {
         // const userID = req.params.id;
@@ -280,6 +281,15 @@ const managerController = {
     },
 
     // manager dissertation//
+    getAlldissertations: async (req, res) => {
+        try {
+            const dissertation = await Dissertation.find();
+            res.json({ success: true, dissertation });
+        } catch (error) {
+            console.error('Error fetching dissertation:', error);
+            res.status(500).json({ success: false, message: 'Lỗi server ~ getAllstudents' });
+        }
+    },
     createDissertation: async (req, res) => {
         try {
 

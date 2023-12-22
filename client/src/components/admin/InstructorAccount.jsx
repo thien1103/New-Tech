@@ -205,12 +205,14 @@ const InstructorAccount = (props) => {
       key: "name",
       align: "center",
     },
+    
     {
       title: "Email",
       dataIndex: "email",
       key: "email",
       align: "center",
     },
+    
     {
       title: "Phone",
       dataIndex: "phone",

@@ -8,6 +8,16 @@ const Specialization = require('../models/specialization.model'); // Replace wit
 
 
 const instructorController = {
+      getAllInstructors: async (req, res) => {
+        try {
+            const instructors = await Instructor.find();
+            res.json({ success: true, instructors });
+        } catch (error) {
+            console.error('Error fetching instructors:', error);
+            res.status(500).json({ success: false, message: 'Lỗi server ~ getAllInstructors' });
+        }
+    },
+
 
     getSpecializationNameById: async (req, res) => {
         try {
@@ -210,6 +220,7 @@ const instructorController = {
             return res.status(500).json({ message: 'Đã xảy ra lỗi.' });
           }
       },
+      //Instructor giao task
       createTaskForStudent : async (req, res) => {
         try {
             const { instructorId, studentId, dissertationId } = req.params;

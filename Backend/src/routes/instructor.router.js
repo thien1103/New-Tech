@@ -25,7 +25,7 @@ router.post('/assign-reviewers/:dissertationId/:instructorIds',instructorControl
 //get specialization name by id
 router.get('/getSpecializationById/:specializationId',instructorController.getSpecializationNameById )
 //
-
+router.get('/getallinstructors', instructorController.getAllInstructors);
 
 
 module.exports = router;    
