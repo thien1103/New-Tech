@@ -223,6 +223,7 @@ const managerController = {
 
     createInstructor: async (req, res) => {
         try {
+
           const { instructorID, name, email, password, phone, specializationId } = req.body;
       
           // Check if the specialization exists
@@ -247,6 +248,7 @@ const managerController = {
         } catch (error) {
           console.error('Error in creating Instructor:', error);
           res.status(500).json({ success: false, message: 'Server error ~ createInstructor' });
+
         }
     },
 
@@ -267,14 +269,18 @@ const managerController = {
     // manager dissertation//
     createDissertation: async (req, res) => {
         try {
-            const { Name, Description,dissertationID, instructorId, specializationId, registrationPeriodId } = req.body;
+
+            const { Name, Description,dissertationID, instructorId, specializationId  } = req.body;
+
     
             // Kiểm tra xem giáo viên, chuyên ngành và kì đăng ký có tồn tại không
             const instructor = await Instructor.findById(instructorId);
             const specialization = await Specialization.findById(specializationId);
-            const registrationPeriod = await RegistrationPeriod.findById(registrationPeriodId);
+
+            
     
-            if (!instructor || !specialization || !registrationPeriod) {
+            if (!instructor || !specialization ) {
+
                 return res.status(400).json({ success: false, message: 'Giáo viên, chuyên ngành hoặc kì đăng ký không tồn tại!' });
             }
     
@@ -285,7 +291,7 @@ const managerController = {
                 dissertationID,
                 InstructorID: instructorId,
                 specializationID: specializationId,
-                RegistrationPeriodID: registrationPeriodId,
+
             });
     
             await newDissertation.save();
@@ -305,6 +311,7 @@ const managerController = {
                 const dissertation = await Dissertation.findById(dissertationId);
                 
                 if (!dissertation) {
+
 
                     return res.status(404).json({ error: 'Đề tài không tồn tại' });
                 }
@@ -356,6 +363,7 @@ const managerController = {
             }
         },
     
+
         addnewspecialization: async (req, res) => {
             try {
                 const { name, description } = req.body;
