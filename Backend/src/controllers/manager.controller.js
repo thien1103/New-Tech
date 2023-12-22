@@ -223,32 +223,32 @@ const managerController = {
 
     createInstructor: async (req, res) => {
         try {
-            const { instructorID, name, gender, email, password, phone, isAccept, specializationId } = req.body;
-    
-            // Kiểm tra xem chuyên ngành có tồn tại không
-            const specialization = await Specialization.findById(specializationId);
-            if (!specialization) {
-                return res.status(400).json({ success: false, message: 'Chuyên ngành không tồn tại!' });
-            }
-    
-            // Tạo giáo viên với chuyên ngành
-            const newInstructor = new Instructor({
-                instructorID,
-                name,
-                gender,
-                email,
-                password,
-                phone,
-                isAccept,
-                specialization: specializationId,
-            });
-    
-            await newInstructor.save();
-            console.log('Create successfully');
-            res.status(201).json({ success: true, newInstructor });
+
+          const { instructorID, name, email, password, phone, specializationId } = req.body;
+      
+          // Check if the specialization exists
+          const specialization = await Specialization.findById(specializationId);
+          if (!specialization) {
+            return res.status(400).json({ success: false, message: 'Chuyên ngành không tồn tại!' });
+          }
+      
+          // Create a new instructor with the specialization
+          const newInstructor = new Instructor({
+            instructorID,
+            name,
+            email,
+            password,
+            phone,
+            specialization: specializationId,
+          });
+      
+          await newInstructor.save();
+          console.log('Created successfully');
+          res.status(201).json({ success: true, newInstructor });
         } catch (error) {
-            console.error('Error in creating Instructor:', error);
-            res.status(500).json({ success: false, message: 'Server error ~ createInstructor' });
+          console.error('Error in creating Instructor:', error);
+          res.status(500).json({ success: false, message: 'Server error ~ createInstructor' });
+
         }
     },
 
@@ -269,14 +269,18 @@ const managerController = {
     // manager dissertation//
     createDissertation: async (req, res) => {
         try {
+
             const { Name, Description,dissertationID, instructorId, specializationId  } = req.body;
+
     
             // Kiểm tra xem giáo viên, chuyên ngành và kì đăng ký có tồn tại không
             const instructor = await Instructor.findById(instructorId);
             const specialization = await Specialization.findById(specializationId);
+
             
     
             if (!instructor || !specialization ) {
+
                 return res.status(400).json({ success: false, message: 'Giáo viên, chuyên ngành hoặc kì đăng ký không tồn tại!' });
             }
     
@@ -287,7 +291,7 @@ const managerController = {
                 dissertationID,
                 InstructorID: instructorId,
                 specializationID: specializationId,
-            
+
             });
     
             await newDissertation.save();
@@ -307,6 +311,7 @@ const managerController = {
                 const dissertation = await Dissertation.findById(dissertationId);
                 
                 if (!dissertation) {
+
 
                     return res.status(404).json({ error: 'Đề tài không tồn tại' });
                 }
@@ -347,6 +352,18 @@ const managerController = {
 
 
         //Quản lý chuyên ngành
+
+        getAllSpecialization: async (req, res) => {
+            try {
+                const specialization = await Specialization.find();
+                res.json({ success: true, specialization });
+            } catch (error) {
+                console.error('Error fetching specialization:', error);
+                res.status(500).json({ success: false, message: 'Lỗi server ~ getAllSpecialization' });
+            }
+        },
+    
+
         addnewspecialization: async (req, res) => {
             try {
                 const { name, description } = req.body;

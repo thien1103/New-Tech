@@ -4,7 +4,9 @@ const instructorController = require('../controllers/instructor.controller');
 
 
 router.get('/instructors/:instructorID', instructorController.getProfileInstructor);
-router.put('/instructors/update-instructor/:instructorID', instructorController.updateProfileInstructor);
+
+router.put('/update-instructor/:instructorId', instructorController.updateProfileInstructor);
+
 
 // Xem danh sách đề tài mà sinh viên đã đăng ký để hướng dẫn
 router.get('/instructor/guidance-dissertations/available', instructorController.viewRegisteredStudents);
@@ -19,7 +21,11 @@ router.post('/department-heads/dissertations/:dissertationId', instructorControl
 router.post('/instructors/process-dissertation/:guidanceId', instructorController.confirmdissertation);
 //TBM
 router.post('/assign-reviewers/:dissertationId/:instructorIds',instructorController.assignreviewer)
+
+//get specialization name by id
+router.get('/getSpecializationById/:specializationId',instructorController.getSpecializationNameById )
 //
-router.get('/instructor/getinstructorbyid/:specializationId',instructorController.getSpecializationNameById )
+
+
 
 module.exports = router;    

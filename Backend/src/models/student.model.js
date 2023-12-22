@@ -2,8 +2,10 @@ const mongoose = require('mongoose');
 
 
 const studentSchema = new mongoose.Schema({
+  
     studentID:{
         type: Number,
+    
     },
 
     name: {

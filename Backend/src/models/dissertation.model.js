@@ -38,9 +38,11 @@ const dissertationSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
+
     Time:{
         type:String,
     },
+
     Status: {
         type: String,
         enum: ['Pending', 'Accepted', 'Rejected', 'InProgress', 'Completed'],

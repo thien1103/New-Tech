@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Button, Form, Input, Image } from "antd";
 import axios from "axios";
 
+
 const UserInfo = ({ studentID, bg }) => {
   const [studentInfo, setStudentInfo] = useState({});
   const [loading, setLoading] = useState(true);
@@ -21,6 +22,7 @@ const UserInfo = ({ studentID, bg }) => {
         console.error(error);
       }
     };
+
 
     fetchStudentInfo();
   }, [studentID]);
@@ -67,6 +69,7 @@ const UserInfo = ({ studentID, bg }) => {
         </div>
         <Form.Item className="flex justify-center items-center w-full"></Form.Item>
       </div>
+
 </div>
   );
   };

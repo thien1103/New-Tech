@@ -88,6 +88,7 @@ const instructorController = {
         try {
           const instructorId = req.params.instructorId;
           const dissertationData = req.body;
+
           const specializationIds = req.body.specializationIds;
       
           const instructor = await Instructor.findById(instructorId);
@@ -95,10 +96,12 @@ const instructorController = {
             return res.status(404).json({ error: 'Giáo viên không tồn tại.' });
           }
       
+
       
           const dissertation = new Dissertation({
             ...dissertationData,
             InstructorID: instructorId,
+
             specializationID: specializationIds,
             isInstructorAccept: true, // Giả sử giáo viên tự đăng ký đề tài và chấp nhận luôn
             Status: 'Pending', // Sửa lại thành 'PendingApproval' để chờ xét duyệt

@@ -1,14 +1,56 @@
 const Student = require('../models/student.model');
 const Dissertation = require('../models/dissertation.model');
 const Guidance = require('../models/guidance.model');
+
+const Instructor = require('../models/instructor.model');
 const multer = require('multer');
 const path = require('path');
+const Specialization = require('../models/specialization.model');
+
 
 
 const studentController = {
 
 
+
+    getInstructorNameById: async (req, res) => {
+        try {
+          const instructorId = req.params.instructorId;
     
+          // Use Mongoose to find specialization by ID
+          const instructor = await Instructor.findById(instructorId);
+    
+          if (!instructor) {
+            return res.status(404).json({ error: 'Instructor not found' });
+          }
+    
+          // Return specialization name
+          res.json({ instructorName: instructor.name });
+        } catch (error) {
+          console.error(error);
+          res.status(500).json({ error: 'Internal Server Error' });
+        }
+      },
+
+      getDissertationNameById: async (req, res) => {
+        try {
+          const dissertationId = req.params.dissertationId;
+    
+          // Use Mongoose to find specialization by ID
+          const dissertation = await Instructor.findById(dissertationId);
+    
+          if (!dissertation) {
+            return res.status(404).json({ error: 'Dissertation not found' });
+          }
+    
+          // Return specialization name
+          res.json({ dissertationName : dissertation.name });
+        } catch (error) {
+          console.error(error);
+          res.status(500).json({ error: 'Internal Server Error' });
+        }
+      },
+
 
     getProfileStudents : async (req, res) => {
         try {
@@ -28,7 +70,6 @@ const studentController = {
             res.status(500).json({ error: 'Internal Server Error' });
           }
     },
-
     updateProfileStudent: async (req, res) => {
         const studentID = req.params.studentID;
         const updateData = req.body; // Assuming the updated data is sent in the request body
