@@ -2,8 +2,10 @@ const mongoose = require('mongoose');
 
 
 const studentSchema = new mongoose.Schema({
+  
     studentID:{
         type: Number,
+    
     },
 
     name: {
@@ -21,7 +23,7 @@ const studentSchema = new mongoose.Schema({
         sparse: true,
         unique: true,
     },
-    birthday: {
+    birthday:{
         type: Date,
     },
     password: {

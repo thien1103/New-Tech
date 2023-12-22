@@ -4,52 +4,80 @@ const Guidance = require('../models/guidance.model');
 const Dissertation = require('../models/dissertation.model');
 const Student = require('../models/student.model');
 const RegistrationPeriod = require('../models/registrationPeriod.model'); //
+const Specialization = require('../models/specialization.model'); // Replace with the actual model for Specialization
 
 
 const instructorController = {
-    getProfileInstructor: async (req, res) => {
-        const instructorId = req.params.instructorId;
-
+      getAllInstructors: async (req, res) => {
         try {
-            // Check if the instructor exists
-            const instructor = await Instructor.findById(instructorId);
-
-            if (!instructor) {
-                return res.status(404).json({ error: 'Giảng viên không tồn tại.' });
-            }
-
-            res.status(200).json(instructor);
+            const instructors = await Instructor.find();
+            res.json({ success: true, instructors });
         } catch (error) {
-            console.error(error);
-            res.status(500).json({ error: 'Đã xảy ra lỗi trong quá trình xử lý.' });
+            console.error('Error fetching instructors:', error);
+            res.status(500).json({ success: false, message: 'Lỗi server ~ getAllInstructors' });
         }
     },
-    updateProfileInstructor: async (req, res) => {
-        const instructorId = req.params.instructorId;
-        const { phone, email } = req.body;
-    
+
+
+    getSpecializationNameById: async (req, res) => {
         try {
-            // Check if the instructor exists
-            const instructor = await Instructor.findById(instructorId);
+          const specializationId = req.params.specializationId;
     
-            if (!instructor) {
-                return res.status(404).json({ error: 'Giảng viên không tồn tại.' });
-            }
+          // Use Mongoose to find specialization by ID
+          const specialization = await Specialization.findById(specializationId);
     
-            // Update personal information
-            if (phone) instructor.phone = phone;
-            if (email) instructor.email = email;
+          if (!specialization) {
+            return res.status(404).json({ error: 'Specialization not found' });
+          }
     
-            // Save changes to the database
-            await instructor.save();
-    
-            // Log the updated instructor object for debugging
-            console.log('Updated Instructor:', instructor);
-    
-            res.status(200).json({ success: 'Cập nhật thông tin cá nhân thành công.' });
+          // Return specialization name
+          res.json({ specializationName: specialization.name });
         } catch (error) {
-            console.error('Error updating instructor:', error);
-            res.status(500).json({ error: 'Đã xảy ra lỗi trong quá trình xử lý.' });
+          console.error(error);
+          res.status(500).json({ error: 'Internal Server Error' });
+        }
+      },
+
+    getProfileInstructor: async (req, res) => {
+        try {
+            const instructorID = req.params.instructorID;
+            
+            // Sử dụng Mongoose để tìm instructor theo instructorID
+            const instructor = await Instructor.findOne({ instructorID });
+        
+            if (!instructor) {
+              return res.status(404).json({ error: 'Instructor not found' });
+            }
+        
+            // Trả về thông tin hồ sơ instructor nếu tìm thấy
+            res.json({ instructor });
+          } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: 'Internal Server Error' });
+          }
+    },
+    updateProfileInstructor: async (req, res) => {
+        const { instructorID } = req.params; // Đây là ID của instructor cần cập nhật
+        const updatedProfile = req.body; // Dữ liệu cập nhật từ người dùng
+
+        try {
+            // Tìm instructor theo ID
+            const instructor = await Instructor.findOne({ instructorID });
+
+            if (!instructor) {
+            return res.status(404).json({ message: 'Instructor not found' });
+            }
+
+            // Cập nhật thông tin hồ sơ
+            Object.assign(instructor, updatedProfile);
+
+            // Lưu thông tin cập nhật vào database
+            await instructor.save();
+
+            return res.status(200).json({ message: 'Profile updated successfully', instructor });
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ message: 'Internal Server Error' });
         }
     },
     viewRegisteredStudents: async (req, res) => {
@@ -70,7 +98,7 @@ const instructorController = {
         try {
           const instructorId = req.params.instructorId;
           const dissertationData = req.body;
-          const registrationPeriodId = req.body.registrationPeriodId;
+
           const specializationIds = req.body.specializationIds;
       
           const instructor = await Instructor.findById(instructorId);
@@ -78,15 +106,12 @@ const instructorController = {
             return res.status(404).json({ error: 'Giáo viên không tồn tại.' });
           }
       
-          const registrationPeriod = await RegistrationPeriod.findById(registrationPeriodId);
-          if (!registrationPeriod) {
-            return res.status(404).json({ error: 'Đợt đăng ký không tồn tại.' });
-          }
+
       
           const dissertation = new Dissertation({
             ...dissertationData,
             InstructorID: instructorId,
-            RegistrationPeriodID: registrationPeriodId,
+
             specializationID: specializationIds,
             isInstructorAccept: true, // Giả sử giáo viên tự đăng ký đề tài và chấp nhận luôn
             Status: 'Pending', // Sửa lại thành 'PendingApproval' để chờ xét duyệt
@@ -165,7 +190,75 @@ const instructorController = {
             console.error(error);
             res.status(500).json({ message: 'Đã xảy ra lỗi trong quá trình xử lý.' });
         }
+    },
+    //Phân giáo viên phản biện
+    assignreviewer: async (req, res) => {
+        try {
+            const { dissertationId, instructorIds } = req.params;
+        
+            const dissertation = await Dissertation.findById(dissertationId);
+        
+            if (!dissertation) {
+              return res.status(404).json({ message: 'Không tìm thấy đề tài.' });
+            }
+        
+            const maxReviewers = 3;
+            const instructorsToAdd = JSON.parse(instructorIds).slice(0, maxReviewers);
+        
+            instructorsToAdd.forEach(instructorId => {
+              dissertation.defenseReview.push({
+                assignedInstructorID: instructorId,
+                comments: '',
+              });
+            });
+        
+            await dissertation.save();
+        
+            return res.status(200).json({ message: 'Phân giáo viên phản biện thành công.' });
+          } catch (error) {
+            console.error(error);
+            return res.status(500).json({ message: 'Đã xảy ra lỗi.' });
+          }
+      },
+      //Instructor giao task
+      createTaskForStudent : async (req, res) => {
+        try {
+            const { instructorId, studentId, dissertationId } = req.params;
+            const { title, description, deadline, instructionsFile } = req.body;
+    
+            // Kiểm tra xem đã có hướng dẫn cho đối tượng này chưa
+            let guidance = await Guidance.findOne({
+                instructor: instructorId,
+                student: studentId,
+                dissertation: dissertationId,
+            });
+    
+            // Nếu chưa có, tạo mới
+            if (!guidance) {
+                guidance = await Guidance.create({
+                    instructor: instructorId,
+                    student: studentId,
+                    dissertation: dissertationId,
+                });
+            }
+    
+            // Thêm task vào đối tượng Guidance
+            guidance.task = {
+                title,
+                description,
+                deadline,
+                instructionsFile,
+            };
+    
+            await guidance.save();
+    
+            res.status(201).json(guidance);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: 'Error creating task for student.' });
+        }
     }
+      
 };
 
 

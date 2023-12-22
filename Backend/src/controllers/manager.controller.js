@@ -20,6 +20,24 @@ const managerController = {
             return res.status(500).json({ message: 'Lỗi server' });
         }
     },
+    getInstructorNameById: async (req, res) => {
+        try {
+          const instructorId = req.params.instructorId;
+    
+          // Use Mongoose to find specialization by ID
+          const instructor = await Instructor.findById(instructorId);
+    
+          if (!instructor) {
+            return res.status(404).json({ error: 'Instructor not found' });
+          }
+    
+          // Return specialization name
+          res.json({ instructorName: instructor.name });
+        } catch (error) {
+          console.error(error);
+          res.status(500).json({ error: 'Internal Server Error' });
+        }
+      },
 
     createManager: async (req, res) => {
         try {
@@ -69,6 +87,15 @@ const managerController = {
           .json({ success: false, message: "Server error ~ getStudentDetail" });
       }
   },
+    getAllStudents: async (req, res) => {
+        try {
+            const students = await Student.find();
+            res.json({ success: true, students });
+        } catch (error) {
+            console.error('Error fetching students:', error);
+            res.status(500).json({ success: false, message: 'Lỗi server ~ getAllstudents' });
+        }
+    },
   
     updateStudent : async (req, res) => {
       try {
@@ -90,58 +117,30 @@ const managerController = {
     
     
     createStudent: async (req, res) => {
-      const session = await mongoose.startSession();
-      session.startTransaction();
+        try {
+
+            const { studentID, studentCode,name, email,birthday, password, phone, classs } = req.body;
+        
+     
+           // Check if the student exists
+            const existingStudent = await Student.findOne({ studentID: studentID });
+            if (existingStudent) {
+            return res.status(400).json({ success: false, message: 'Student already exists' });
+            }
+        
+            // Create a new instructor with the specialization
+            const newStudent = new Student({
+                studentID, studentCode,name, email,birthday, password, phone, classs
+            });
+        
+            await newStudent.save();
+            console.log('Created successfully');
+            res.status(201).json({ success: true, newStudent });
+          } catch (error) {
+            console.error('Error in creating Student:', error);
+            res.status(500).json({ success: false, message: 'Server error ~ createStudent' });
   
-      try {
-          const {
-              studentID,
-              name,
-              studentCode,
-              birthday,
-              gender,
-              email,
-              phone,
-              classs,
-              departemt,
-          } = req.body;
-  
-          // Tìm kiếm sinh viên theo studentCode
-          const existingStudent = await Student.findOne({ studentCode });
-  
-          // Kiểm tra xem sinh viên đã tồn tại hay chưa
-          if (existingStudent) {
-              throw new Error("Sinh viên đã tồn tại!");
           }
-  
-          // Tạo một đối tượng Student mới
-          const newStudent = new Student({
-              studentID,
-              name,
-              studentCode,
-              birthday,
-              email,
-              gender,
-              phone,
-              departemt,
-              classs,
-          });
-  
-          // Lưu sinh viên mới vào cơ sở dữ liệu
-          await newStudent.save();
-  
-          await session.commitTransaction();
-          session.endSession();
-  
-          console.log("Sinh viên đã được tạo mới thành công");
-          return res.status(201).json(newStudent);
-      } catch (error) {
-          await session.abortTransaction();
-          session.endSession();
-  
-          console.log(error);
-          res.status(500).json({ message: error.message });
-      }
   },
   
     
@@ -223,32 +222,32 @@ const managerController = {
 
     createInstructor: async (req, res) => {
         try {
-            const { instructorID, name, gender, email, password, phone, isAccept, specializationId } = req.body;
-    
-            // Kiểm tra xem chuyên ngành có tồn tại không
-            const specialization = await Specialization.findById(specializationId);
-            if (!specialization) {
-                return res.status(400).json({ success: false, message: 'Chuyên ngành không tồn tại!' });
-            }
-    
-            // Tạo giáo viên với chuyên ngành
-            const newInstructor = new Instructor({
-                instructorID,
-                name,
-                gender,
-                email,
-                password,
-                phone,
-                isAccept,
-                specialization: specializationId,
-            });
-    
-            await newInstructor.save();
-            console.log('Create successfully');
-            res.status(201).json({ success: true, newInstructor });
+
+          const { instructorID, name, email, password, phone, specializationId } = req.body;
+      
+          // Check if the specialization exists
+          const specialization = await Specialization.findById(specializationId);
+          if (!specialization) {
+            return res.status(400).json({ success: false, message: 'Chuyên ngành không tồn tại!' });
+          }
+      
+          // Create a new instructor with the specialization
+          const newInstructor = new Instructor({
+            instructorID,
+            name,
+            email,
+            password,
+            phone,
+            specialization: specializationId,
+          });
+      
+          await newInstructor.save();
+          console.log('Created successfully');
+          res.status(201).json({ success: true, newInstructor });
         } catch (error) {
-            console.error('Error in creating Instructor:', error);
-            res.status(500).json({ success: false, message: 'Server error ~ createInstructor' });
+          console.error('Error in creating Instructor:', error);
+          res.status(500).json({ success: false, message: 'Server error ~ createInstructor' });
+
         }
     },
 
@@ -267,16 +266,29 @@ const managerController = {
     },
 
     // manager dissertation//
+    getAlldissertations: async (req, res) => {
+        try {
+            const dissertation = await Dissertation.find();
+            res.json({ success: true, dissertation });
+        } catch (error) {
+            console.error('Error fetching dissertation:', error);
+            res.status(500).json({ success: false, message: 'Lỗi server ~ getAllstudents' });
+        }
+    },
     createDissertation: async (req, res) => {
         try {
-            const { Name, Description,dissertationID, instructorId, specializationId, registrationPeriodId } = req.body;
+
+            const { Name, Description,dissertationID, instructorId, specializationId  } = req.body;
+
     
             // Kiểm tra xem giáo viên, chuyên ngành và kì đăng ký có tồn tại không
             const instructor = await Instructor.findById(instructorId);
             const specialization = await Specialization.findById(specializationId);
-            const registrationPeriod = await RegistrationPeriod.findById(registrationPeriodId);
+
+            
     
-            if (!instructor || !specialization || !registrationPeriod) {
+            if (!instructor || !specialization ) {
+
                 return res.status(400).json({ success: false, message: 'Giáo viên, chuyên ngành hoặc kì đăng ký không tồn tại!' });
             }
     
@@ -287,7 +299,7 @@ const managerController = {
                 dissertationID,
                 InstructorID: instructorId,
                 specializationID: specializationId,
-                RegistrationPeriodID: registrationPeriodId,
+
             });
     
             await newDissertation.save();
@@ -307,6 +319,7 @@ const managerController = {
                 const dissertation = await Dissertation.findById(dissertationId);
                 
                 if (!dissertation) {
+
 
                     return res.status(404).json({ error: 'Đề tài không tồn tại' });
                 }
@@ -347,6 +360,18 @@ const managerController = {
 
 
         //Quản lý chuyên ngành
+
+        getAllSpecialization: async (req, res) => {
+            try {
+                const specialization = await Specialization.find();
+                res.json({ success: true, specialization });
+            } catch (error) {
+                console.error('Error fetching specialization:', error);
+                res.status(500).json({ success: false, message: 'Lỗi server ~ getAllSpecialization' });
+            }
+        },
+    
+
         addnewspecialization: async (req, res) => {
             try {
                 const { name, description } = req.body;

@@ -38,6 +38,11 @@ const dissertationSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
+
+    Time:{
+        type:String,
+    },
+
     Status: {
         type: String,
         enum: ['Pending', 'Accepted', 'Rejected', 'InProgress', 'Completed'],
@@ -49,6 +54,15 @@ const dissertationSchema = new mongoose.Schema({
     departmentHeadComment: {
         type: String,
     },
+    defenseReview: [{
+        assignedInstructorID: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Instructor',
+        },
+        comments: {
+            type: String,
+        },
+    }],
 
     
 },{ limit: false });
