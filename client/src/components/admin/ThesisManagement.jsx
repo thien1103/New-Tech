@@ -170,6 +170,7 @@ const ThesisManagement = (props) => {
       setLoading(false);
     }
   };
+  
   const fetchDataSpecialization = async () => {
     try {
       const response = await axios.get(

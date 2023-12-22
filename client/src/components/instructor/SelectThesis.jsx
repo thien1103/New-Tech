@@ -1,136 +1,85 @@
-import {
-  Button,
-  Col,
-  Divider,
-  Drawer,
-  Form,
-  Input,
-  Row,
-  Space,
-  Table,
-} from "antd";
-import { EyeOutlined } from "@ant-design/icons";
+import { Button, Select, Form, Input,message} from "antd";
 import dayjs from "dayjs";
-import { useState } from "react";
-import { useSearchParams } from "react-router-dom";
-const DescriptionItem = ({ title, content }) => (
-  <div className=" mb-[7px] text-[14px] leading-[1.5715] ">
-    <p className=" inline-block mr-[8px]">{title}:</p>
-    {content}
-  </div>
-);
+import { useState, useEffect } from "react";
+import axios from "axios";
+const {Option} = Select;
+
+
 const SelectThesis = (props) => {
   const { bg } = props;
   const [form] = Form.useForm();
-  const [open, setOpen] = useState(false);
-  const showDrawer = () => {
-    setOpen(true);
-  };
-  const onClose = () => {
-    setOpen(false);
-  };
-  const [searchParams, setSearchParams] = useSearchParams();
-  const handleSearch = async (values) => {
-    for (const key in values) {
-      if (Object.prototype.hasOwnProperty.call(values, key)) {
-        // Kiểm tra xem thuộc tính có bằng undefined không
-        if (values[key] === undefined) {
-          // Gán thuộc tính bằng ""
-          values[key] = "";
-        }
-      }
+  const [Selectnstructor, setSelectnstructor] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [selectSpecializations, setSelectSpecializations] = useState([]);
+
+
+ 
+  const fetchAllInstructor = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8000/instructors/getallinstructors`
+      );
+      const instructorDatas = response.data.instructors;
+      setSelectnstructor(instructorDatas);
+    } catch (error) {
+      console.error(error);
+      return {};
     }
-    setSearchParams(values);
   };
-  const handleReset = () => {
-    setSearchParams({});
-    form.resetFields();
+  useEffect(() => {
+    fetchAllInstructor();
+  }, []);
+
+
+  const fetchDataSpecialization = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:8000/managers/getAllSpecializations"
+      );
+      const specializationData = response.data.specialization;
+      setSelectSpecializations(specializationData);
+    } catch (error) {
+      console.error(error);
+    }
   };
-  const data = [
-    {
-      thesisID: "1",
-      thesisName: "Rắn Săn Mồi AI Game",
-      time: "15 weeks",
-      userName: "Nguyễn Văn A",
-      specialization: "Artificial Intelligence",
-    },
-    {
-      thesisID: "2",
-      thesisName: "Xây dựng trang web bán hàng thông minh",
-      time: "15 weeks",
-      userName: "Lê Thị B",
-      specialization: "Software Technology",
-    },
-    {
-      thesisID: "3",
-      thesisName: "Kết nối mạng lưới Internet nội bộ",
-      time: "15 weeks",
-      userName: "Đào Văn C",
-      specialization: "Information System",
-    },
-  ];
-  const columns = [
-    {
-      title: "ID",
-      dataIndex: "thesisID",
-      key: "thesisID",
-      align: "center",
-    },
-    {
-      title: "Tên đề tài",
-      dataIndex: "thesisName",
-      key: "thesisName",
-      align: "center",
-    },
-    {
-      title: "Thời gian thực hiện",
-      dataIndex: "time",
-      key: "time",
-      align: "center",
-    },
-    {
-      title: "Nhóm sinh viên",
-      dataIndex: "userName",
-      key: "userName",
-      align: "center",
-    },
-    {
-      title: "Chuyên ngành",
-      dataIndex: "specialization",
-      key: "specialization",
-      align: "center",
-    },
-    {
-      title: "Đăng kí",
-      dataIndex: "register",
-      key: "register",
-      align: "center",
-      width: 100,
-      render: (_, record) => {
-        
-          return (
-            <div className="flex justify-center">
-              <Button className="mr-2" type="default" onClick={() => {}}>
-                Đăng kí
-              </Button>
-            </div>
-          );
-      },
-    },
-    {
-      title: "Morde detail",
-      key: "moredetail",
-      align: "center",
-      render: (_, record) => (
-        <Space size="middle">
-          <EyeOutlined
-            onClick={showDrawer}
-            className=" hover:text-blue-400 cursor-pointer"
-          />
-        </Space>
-      ),
-    },
-  ];
+  useEffect(() => {
+    fetchDataSpecialization();
+  }, []);
+
+
+  const handleFormSubmit = async () => {
+    try {
+      const values = form.getFieldsValue();
+      console.log("Data to be sent:", values);
+      setLoading(true);
+
+      const response = await axios.post(
+        "http://localhost:8000/managers/postDissertation/create",
+        values
+      );
+
+      if (response.status === 201) {
+        setLoading(false);
+        message.success("Dissertation created successfully");
+    //    fetchData();
+      } else {
+        message.error("Failed to create Dissertation");
+      }
+    } catch (error) {
+      console.error("Error in creating Dissertation:", error);
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        console.error("Backend error message:", error.response.data.message);
+      }
+      message.error("Failed to create Dissertation");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div
       className="flex flex-col"
@@ -140,52 +89,57 @@ const SelectThesis = (props) => {
         background: bg,
       }}
     >
-      <div className=" mb-2 pb-2 border-b-[1px] border-black border-solid">
-        <Form layout="inline" onFinish={handleSearch} form={form}>
-          <Form.Item label="Thesis name" name="thesisName">
-            <Input defaultValue={searchParams.get("thesisName")}></Input>
-          </Form.Item>
-          <Form.Item label="Thesis ID" name="thesisID">
-            <Input defaultValue={searchParams.get("thesisID")}></Input>
-          </Form.Item>
-          <Form.Item>
-            <Button htmlType="submit">Search</Button>
-          </Form.Item>
-          <Form.Item>
+      <div className="flex justify-center items-center">
+          <Form className="w-1/3 flex-col justify-center items-center" form={form} onFinish={handleFormSubmit}>
+            <span>Dissertation ID</span>
+            <Form.Item  name="dissertationID" >
+              <Input />
+            </Form.Item>
+            <span>Dissertation Name</span>
+            <Form.Item name="Name" >
+              <Input />
+            </Form.Item>
+            <span>Description</span>
+            <Form.Item name="Description" >
+              <Input />
+            </Form.Item>
+            <span>Thời gian thực hiện </span>
+            <Form.Item name="Time" >
+              <Input />
+            </Form.Item>
+            <span>Instructor</span>
+            <Form.Item name="instructorId" >
+              <Select defaultValue="" className="mt-1">
+                {Selectnstructor.map((instructors) => (
+                  <Option
+                    key={instructors._id}
+                    value={instructors._id}
+                  >
+                    {instructors.name}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+            <span>Chọn chuyên ngành</span>
+            <Form.Item name="specializationId">
+              <Select defaultValue="" className="mt-1">
+                {selectSpecializations.map((specialization) => (
+                  <Option key={specialization._id} value={specialization._id}>
+                    {specialization.name}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+
             <Button
-              className=" bg-red-600 text-white hover:!text-white hover:!border-none"
-              onClick={handleReset}
+              className="justify-center align-center flex bg-green-700 text-white hover:!  text-white hover:!border-none max-w-max relative left-40"
+              onClick={() => handleFormSubmit()}
+              loading={loading}
             >
-              Reset
+              <span>Xác nhận</span>
             </Button>
-          </Form.Item>
-        </Form>
-      </div>
-      <div className="">
-        <Table dataSource={data} columns={columns} bordered></Table>
-        <Drawer
-          width={640}
-          placement="right"
-          // closable={false}
-          onClose={onClose}
-          open={open}
-          // extra={
-          //   <Space>
-          //     <Button onClick={onClose}>Cancel</Button>
-          //   </Space>
-          // }
-        >
-          <p
-            className=" block mb-[16px] text-[16px] leading-[1.5175]"
-            style={{
-              marginBottom: 24,
-            }}
-          >
-            This is page for the topic details
-          </p>
-          
-        </Drawer>
-      </div>
+          </Form>
+        </div>
     </div>
   );
 };
