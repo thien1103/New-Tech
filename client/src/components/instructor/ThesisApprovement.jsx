@@ -1,106 +1,168 @@
 import {
     Button,
-    Col,
-    Divider,
-    Drawer,
     Form,
-    Input,
-    Row,
-    Space,
     Table,
   } from "antd";
-  import { EyeOutlined } from "@ant-design/icons";
-  import dayjs from "dayjs";
-  import { useState } from "react";
-  import { useSearchParams } from "react-router-dom";
-  const DescriptionItem = ({ title, content }) => (
-    <div className=" mb-[7px] text-[14px] leading-[1.5715] ">
-      <p className=" inline-block mr-[8px]">{title}:</p>
-      {content}
-    </div>
-  );
+  import { useState,useEffect } from "react";
+  import axios from "axios";
+ 
   const ThesisApprovement = (props) => {
     const { bg } = props;
-    const [form] = Form.useForm();
-    const [open, setOpen] = useState(false);
-    const showDrawer = () => {
-      setOpen(true);
-    };
-    const onClose = () => {
-      setOpen(false);
-    };
-    const [searchParams, setSearchParams] = useSearchParams();
-    const handleSearch = async (values) => {
-      for (const key in values) {
-        if (Object.prototype.hasOwnProperty.call(values, key)) {
-          // Kiểm tra xem thuộc tính có bằng undefined không
-          if (values[key] === undefined) {
-            // Gán thuộc tính bằng ""
-            values[key] = "";
-          }
-        }
+    const [form] = Form.useForm();    
+    const [data, setData] = useState([]);
+
+
+
+    const fetchInstructorName = async (InstructorID) => {
+      try {
+        const response = await axios.get(
+          `http://localhost:8000/students/getInstructorNameById/${InstructorID}`
+        );
+        return response.data || {}; // Return the object directly
+      } catch (error) {
+        console.error(error);
+        return {};
       }
-      setSearchParams(values);
     };
-    const handleReset = () => {
-      setSearchParams({});
-      form.resetFields();
+  
+    const fetchAssignedInstructorName = async (assignedInstructorIDs) => {
+      try {
+        const instructorNames = await Promise.all(
+          assignedInstructorIDs.map(async (id) => {
+            const response = await axios.get(
+              `http://localhost:8000/students/getInstructorNameById/${id}`
+            );
+            return response.data.instructorName || "";
+          })
+        );
+        return instructorNames;
+      } catch (error) {
+        console.error(error);
+        return [];
+      }
     };
-    const data = [
-      {
-        thesisID: "1",
-        thesisName: "Rắn Săn Mồi AI Game",
-        userName: "An",
-        time: "15 weeks",
-        instructorName: "Hoàng Văn Dũng",
-        specialization: "Artificial Intelligence",
-      },
-      {
-        thesisID: "2",
-        thesisName: "Xây dựng trang web bán hàng thông minh",
-        userName: "Dũng",
-        time: "15 weeks",
-        instructorName: "Nguyễn văn B",
-        specialization: "Software Technology",
-      },
-      {
-        thesisID: "3",
-        thesisName: "Kết nối mạng lưới Internet nội bộ",
-        userName: "Vũ",
-        time: "15 weeks",
-        instructorName: "Nguyễn Đăng Quang",
-        specialization: "Information System",
-      },
-    ];
+  
+    const fetchSpecializationName = async (specializationId) => {
+      try {
+        const response = await axios.get(
+          `http://localhost:8000/instructors/getSpecializationById/${specializationId}`
+        );
+        return response.data || {}; // Return the object directly
+      } catch (error) {
+        console.error(error);
+        return {};
+      }
+    };
+
+
+
+    useEffect(() => {
+      fetchDataDissertation();
+    }, []);
+  
+    const fetchDataDissertation = async () => {
+      try {
+        const availableDissertationsResponse = await axios.get(
+          "http://localhost:8000/students/student/available-dissertations"
+        );
+  
+        const updatedData = await Promise.all(
+          availableDissertationsResponse.data.map(async (item, index) => {
+          const instructor = await fetchInstructorName(item.InstructorID);
+          const assignedInstructorIDs = item.defenseReview.map(
+            (review) => review.assignedInstructorID
+          );
+          const assignedInstructors = await fetchAssignedInstructorName(
+            assignedInstructorIDs
+          );
+          const specialization = await fetchSpecializationName(
+            item.specializationID
+          );
+            return {
+              key: index,
+              dissertationId: item._id || "", // Placeholder for dissertation ID
+              dissertationID: item.dissertationID || "",
+              name: item.Name || "",
+              instructor: instructor.instructorName || "",
+            assignedInstructors: assignedInstructors || [],
+            specialization: specialization.specializationName || "",
+
+            };
+            
+          })
+          
+        );
+          
+        setData(updatedData);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    const handleApprove = async (dissertationId, decision) => {
+      try {
+        const response = await axios.post(
+          `http://localhost:8000/instructors/department-heads/dissertations/${dissertationId}`,
+          { decision }
+        );
+    
+        if (response.status === 200) {
+          // Process successful response
+          console.log('Dissertation status updated successfully');
+          // Optionally, update the state or UI as needed after successful update
+        } else {
+          console.error('Failed to update dissertation status');
+        }
+      } catch (error) {
+        console.error('Error occurred while updating dissertation status:', error);
+      }
+    };
+
+    
     const columns = [
       {
+
+        dataIndex: "dissertationId",
+        key: "dissertationId",
+        align: "center",
+        render: () => null, // Render function that returns null, effectively hiding the content
+
+      },
+      {
         title: "ID",
-        dataIndex: "thesisID",
-        key: "thesisID",
+        dataIndex: "dissertationID",
+        key: "dissertationID",
         align: "center",
       },
       {
         title: "Tên đề tài",
-        dataIndex: "thesisName",
-        key: "thesisName",
+        dataIndex: "name",
+        key: "name",
         align: "center",
       },
       {
-        title: "Nhóm sinh viên thực hiện",
-        dataIndex: "userName",
-        key: "userName",
+        title: "Mô tả",
+        dataIndex: "description",
+        key: "description",
         align: "center",
       },
       {
-        title: "Thời gian thực hiện",
-        dataIndex: "time",
-        key: "time",
+        title: "GVPB",
+        dataIndex: "assignedInstructors",
+        key: "assignedInstructors",
         align: "center",
+        render: (assignedInstructors) => (
+          <ul>
+            {assignedInstructors.map((instructor, index) => (
+              <li key={index}>{instructor}</li>
+            ))}
+          </ul>
+        ),
       },
       {
         title: "GVHD",
-        dataIndex: "instructorName",
-        key: "instructorName",
+        dataIndex: "instructor",
+        key: "instructor",
         align: "center",
       },
       {
@@ -116,21 +178,26 @@ import {
         align: "center",
         width: 100,
         render: (_, record) => {
-    
-            return (
-              <div className="flex justify-center">
-                <Button className="mr-2" type="default" onClick={() => {}}>
-                  Duyệt
-                </Button>
-                <Button type="default" danger onClick={() => {}}>
-                  Từ Chối
-                </Button>
-              </div>
-            );
-          
+          return (
+            <div className="flex justify-center">
+              <Button
+                className="mr-2"
+                type="default"
+                onClick={() => handleApprove(record.dissertationId, 'accept')}
+              >
+                Duyệt
+              </Button>
+              <Button
+                type="default"
+                danger
+                onClick={() => handleApprove(record.dissertationId, 'reject')}
+              >
+                Từ Chối
+              </Button>
+            </div>
+          );
         },
       },
-    
     ];
     return (
       <div
@@ -141,51 +208,9 @@ import {
           background: bg,
         }}
       >
-        <div className=" mb-2 pb-2 border-b-[1px] border-black border-solid">
-          <Form layout="inline" onFinish={handleSearch} form={form}>
-            <Form.Item label="Thesis name" name="thesisName">
-              <Input defaultValue={searchParams.get("thesisName")}></Input>
-            </Form.Item>
-            <Form.Item label="Thesis ID" name="thesisID">
-              <Input defaultValue={searchParams.get("thesisID")}></Input>
-            </Form.Item>
-            <Form.Item>
-              <Button htmlType="submit">Search</Button>
-            </Form.Item>
-            <Form.Item>
-              <Button
-                className=" bg-red-600 text-white hover:!text-white hover:!border-none"
-                onClick={handleReset}
-              >
-                Reset
-              </Button>
-            </Form.Item>
-          </Form>
-        </div>
         <div className="">
-          <Table dataSource={data} columns={columns} bordered></Table>
-          <Drawer
-            width={640}
-            placement="right"
-            // closable={false}
-            onClose={onClose}
-            open={open}
-            // extra={
-            //   <Space>
-            //     <Button onClick={onClose}>Cancel</Button>
-            //   </Space>
-            // }
-          >
-            <p
-              className=" block mb-[16px] text-[16px] leading-[1.5175]"
-              style={{
-                marginBottom: 24,
-              }}
-            >
-              This is page for the topic details
-            </p>
-            
-          </Drawer>
+          <Table dataSource={data} columns={columns} bordered rowKey="dissertationID"></Table>
+        
         </div>
       </div>
     );

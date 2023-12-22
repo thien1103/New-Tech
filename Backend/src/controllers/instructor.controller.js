@@ -159,38 +159,52 @@ const instructorController = {
     },
     
     //Trưởng bộ môn xét duyệt
-    approveDissertation : async (req, res) => {
-        const { decision } = req.body; // decision có thể là 'accept' hoặc 'reject'
+    approveDissertation: async (req, res) => {
+      const { decision } = req.body; // decision can be 'accept' or 'reject'
     
-        try {
-            const dissertation = await Dissertation.findById(req.params.dissertationId);
+      try {
+        const dissertation = await Dissertation.findById(req.params.dissertationId);
     
-            if (!dissertation) {
-                return res.status(404).json({ message: 'Đề tài không tồn tại.' });
-            }
-    
-            // Xác nhận hoặc từ chối đề tài
-            if (decision === 'accept') {
-                dissertation.Status = 'Accepted';
-            } else if (decision === 'reject') {
-                dissertation.Status = 'Rejected';
-            } else {
-                return res.status(400).json({ message: 'Decision không hợp lệ.' });
-            }
-    
-            dissertation.isConfirmed = true;
-    
-            await dissertation.save();
-    
-            const confirmationMessage =
-                decision === 'accept' ? 'Đề tài đã được xác nhận.' : 'Đề tài đã bị từ chối.';
-    
-            return res.status(200).json({ message: confirmationMessage });
-        } catch (error) {
-            console.error(error);
-            res.status(500).json({ message: 'Đã xảy ra lỗi trong quá trình xử lý.' });
+        if (!dissertation) {
+          return res.status(404).json({ message: 'Đề tài không tồn tại.' });
         }
+    
+        // Update dissertation status based on the decision
+        if (decision === 'accept') {
+          dissertation.Status = 'Accepted';
+        } else if (decision === 'reject') {
+          dissertation.Status = 'Rejected';
+        } else {
+          return res.status(400).json({ message: 'Decision không hợp lệ.' });
+        }
+  
+    
+        await dissertation.save();
+    
+        // Update the corresponding Guidance record
+        const guidance = await Guidance.findOne({ dissertation: req.params.dissertationId });
+    
+        if (!guidance) {
+          return res.status(404).json({ message: 'Hướng dẫn không tồn tại.' });
+        }
+    
+        if (decision === 'accept') {
+          guidance.status = 'Accepted';
+        } else if (decision === 'reject') {
+          guidance.status = 'Rejected';
+        } else {
+          return res.status(400).json({ message: 'Decision không hợp lệ.' });
+        }
+        await guidance.save();
+    
+        return res.status(200).json({ message: 'thành công' });
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Đã xảy ra lỗi trong quá trình xử lý.' });
+      }
     },
+
+    
     //Phân giáo viên phản biện
     assignreviewer: async (req, res) => {
         try {

@@ -54,7 +54,7 @@ const InstructorPage = () => {
   }
   const siderItems = [
     getItem("Quản lý Tài Khoản", "account-management", <ToolOutlined />),
-    getItem("Đăng Kí Đề Tài", "select-thesis", <ContainerOutlined />),
+    getItem("Tạo Đề Tài", "select-thesis", <ContainerOutlined />),
     getItem("Duyệt Đề Tài", "thesis-approvement", <ToolOutlined />),
     getItem("Quản Lý Đề Tài", "thesis-management", <TeamOutlined />),
     getItem("Phân GV Phản Biện", "schedule-instructor", <ToolOutlined />),
