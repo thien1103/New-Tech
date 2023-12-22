@@ -8,7 +8,9 @@ const UserInfo = ({ studentID, bg }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const studentID = '1'
+    const user = JSON.parse(localStorage.getItem('user'));
+    const studentID = user.id;
+    console.log(studentID);
     // Fetch student information from the backend API
     const fetchStudentInfo = async () => {
       try {

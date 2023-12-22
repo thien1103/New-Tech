@@ -17,9 +17,11 @@ router.delete('/:id', managercontroller.deleteManager);
 //Quản lý student
 router.get('/getallStudents', managercontroller.getAllStudents);
 router.get('/getstudents/:stc', managercontroller.getAllStudentbystcode)
+router.get('/getstudent/:id', managercontroller.getStudentById);
 router.post("/poststudents/create", managercontroller.createStudent);
 router.put("/putstudents/update/:id", managercontroller.updateStudent);
 router.delete("/deletestudents/delete/:id", managercontroller.deleteStudent);
+
 
 //Quản lý instructor
 

@@ -11,7 +11,8 @@ const UserInfo = ({ studentID, bg }) => {
     // Fetch student information from the backend API
     const fetchStudentInfo = async () => {
       try {
-        const studentID = '1';
+        const user = JSON.parse(localStorage.getItem('user'));
+        const studentID = user.id;
         const response = await axios.get(`http://localhost:8000/students/students/${studentID}`);
         setStudentInfo(response.data.student);
         setLoading(false);
@@ -25,7 +26,8 @@ const UserInfo = ({ studentID, bg }) => {
 
   const handleSave = async () => {
     try {
-      const studentID = '1';
+      const user = JSON.parse(localStorage.getItem('user'));
+      const studentID = user.id;
       const values = await form.validateFields();
       const response = await axios.put(`http://localhost:8000/students/editprofile/${studentID}`, values);
       if (response.status === 200) {

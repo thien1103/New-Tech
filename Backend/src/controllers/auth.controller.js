@@ -13,36 +13,88 @@ const Role = require('../models/role.model'); // Update the path to your role mo
 const Account = require('../models/account.model'); // Update the path to your account model
 
 
+const Instructor = require('../models/instructor.model');
+const Student = require('../models/student.model');
+const Manager = require('../models/manager.model');
+const { ObjectId } = require('mongoose').Types;
+
+
+
 exports.signup = async (req, res) => {
   try {
+    const { accountID, username, email, password, roles } = req.body;
+
+    // Check if the accountID corresponds to a Student or Instructor
+    const isStudent = await Student.exists({ _id: accountID });
+    const isInstructor = await Instructor.exists({ _id: accountID });
+    const isManager = await Manager.exists({_id: accountID});
+
+    if (!isStudent && !isInstructor && !isManager) {
+      return res.status(400).send({ message: 'Invalid accountID. Must be a valid Student or Instructor ID.' });
+    }
+
     const user = new Account({
-      accountID: req.body.accountID,
-      username: req.body.username,
-      email: req.body.email,
-      password: bcrypt.hashSync(req.body.password, 8),
+      accountID: new ObjectId(accountID), // Create an ObjectId instance 
+      username,
+      email,
+      password: bcrypt.hashSync(password, 8),
     });
 
     await user.save();
 
-    let roles;
-    if (req.body.roles) {
-      roles = await Role.find({
-        name: { $in: req.body.roles },
+    let userRoles;
+    if (roles) {
+      userRoles = await Role.find({
+        name: { $in: roles },
       });
     } else {
-      roles = await Role.findOne({ name: "STUDENT" });
+      // Default role for a new user
+      userRoles = await Role.findOne({ name: "STUDENT" });
     }
 
-    if (roles) {
-      user.roles = Array.isArray(roles) ? roles.map((role) => role._id) : [roles._id];
+    if (userRoles) {
+      user.roles = Array.isArray(userRoles) ? userRoles.map(role => role._id) : [userRoles._id];
       await user.save();
     }
 
     res.send({ message: "User was registered successfully!" });
-  } catch (err) {
-    res.status(500).send({ message: err.message });
+  }  catch (err) {
+    console.error('Error in signup:', err);
+    res.status(500).send({ message: 'Internal Server Error.' });
   }
+  
 };
+
+// exports.signup = async (req, res) => {
+//   try {
+//     const user = new Account({
+//       accountID: req.body.accountID,
+//       username: req.body.username,
+//       email: req.body.email,
+//       password: bcrypt.hashSync(req.body.password, 8),
+//     });
+
+//     await user.save();
+
+//     let roles;
+//     if (req.body.roles) {
+//       roles = await Role.find({
+//         name: { $in: req.body.roles },
+//       });
+//     } else {
+//       roles = await Role.findOne({ name: "STUDENT" });
+//     }
+
+//     if (roles) {
+//       user.roles = Array.isArray(roles) ? roles.map((role) => role._id) : [roles._id];
+//       await user.save();
+//     }
+
+//     res.send({ message: "User was registered successfully!" });
+//   } catch (err) {
+//     res.status(500).send({ message: err.message });
+//   }
+// };
 
 exports.signin = async (req, res) => {
   try {
@@ -74,7 +126,7 @@ exports.signin = async (req, res) => {
     const authorities = user.roles.map(role => "ROLE_" + role.name.toUpperCase());
 
     res.status(200).send({
-      id: user._id,
+      id: user.accountID,
       username: user.username,
       email: user.email,
       roles: authorities,

@@ -97,6 +97,20 @@ const managerController = {
             res.status(500).json({ success: false, message: 'Lỗi server ~ getAllstudents' });
         }
     },
+
+    getStudentById: async (req, res) => {
+        try {
+            const student = await Student.findById(req.params.id);
+            if (student) {
+                res.json({ success: true, student });
+            } else {
+                res.status(404).json({ success: false, message: 'Không tìm thấy học sinh!' });
+            }
+        } catch (error) {
+            console.error('Error in getting Student information:', error);
+            res.status(500).json({ success: false, message: 'Lỗi server ~ getStudentById' });
+        }
+    },
   
 
 
@@ -376,59 +390,18 @@ const managerController = {
             }
         },
 
-
-            // Kiểm tra xem đề tài có tồn tại không
-            console.log(dissertationId)
-            const dissertation = await Dissertation.findById(dissertationId);
-
-            if (!dissertation) {
-
-                return res.status(404).json({ error: 'Đề tài không tồn tại' });
-            }
-
-
-            // Cập nhật thông tin đề tài
-            const updatedDissertation = await Dissertation.findByIdAndUpdate(
-                req.params.id,
-                {
-                    Name,
-                    Description,
-                    dissertationID,
-                    InstructorID: instructorId,
-                    specializationID: specializationId,
-                    RegistrationPeriodID: registrationPeriodId,
-                },
-                { new: true }
-            );
-
-            return res.json({ success: true, message: 'Cập nhật đề tài thành công', updatedDissertation });
-        } catch (error) {
-            console.error('Error updating dissertation:', error);
-            return res.status(500).json({ success: false, message: 'Server error ~ updateDissertation' });
-        }
-    },
-    deleteDissertation: async (req, res) => {
-        try {
-            const deletedDissertation = await Dissertation.findByIdAndDelete(req.params.id);
-            if (deletedDissertation) {
-                res.json({ success: true, message: 'Xóa đề tài thành công!' });
-            } else {
-                res.status(404).json({ success: false, message: 'Không tìm thấy đề tài để xóa!' });
-
-        },
-    
-
+        
         addnewspecialization: async (req, res) => {
             try {
                 const { name, description } = req.body;
         
-                // Kiểm tra xem chuyên ngành có tồn tại chưa
+                // Check if the specialization already exists
                 const existingSpecialization = await Specialization.findOne({ name });
                 if (existingSpecialization) {
                     return res.status(400).json({ error: 'Chuyên ngành đã tồn tại.' });
                 }
         
-                // Tạo chuyên ngành mới
+                // Create a new specialization
                 const newSpecialization = new Specialization({ name, description });
                 await newSpecialization.save();
         
@@ -436,14 +409,9 @@ const managerController = {
             } catch (error) {
                 console.error(error);
                 res.status(500).json({ error: 'Đã xảy ra lỗi trong quá trình xử lý.' });
-
             }
-        } catch (error) {
-            console.error('Error in deleting Dissertation:', error);
-            res.status(500).json({ success: false, message: 'Lỗi server ~ deleteDissertation' });
-        }
-    },
-
+        },
+        
 
     //Quản lý chuyên ngành
 
@@ -624,6 +592,7 @@ const managerController = {
         }
     },
 };
+
 
 
 
