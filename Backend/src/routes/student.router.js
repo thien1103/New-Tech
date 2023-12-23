@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const studentController = require('../controllers/student.controller');
 
+
 //Show thông tin student
 router.get('/students/:studentId', studentController.getProfileStudents);
 //Edit profile

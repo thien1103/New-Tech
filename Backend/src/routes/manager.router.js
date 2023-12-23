@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const managercontroller = require('../controllers/manager.controller');
-
+const authJwt = require('../middleware/authJwt');
 
 
 router.get('/getManagers/:id', managercontroller.getManagerById);
@@ -15,7 +15,7 @@ router.put('/:id', managercontroller.updateManager);
 
 router.delete('/:id', managercontroller.deleteManager);
 //Quản lý student
-router.get('/getallStudents', managercontroller.getAllStudents);
+router.get('/getallStudents',[authJwt.verifyToken], managercontroller.getAllStudents);
 router.get('/getstudents/:stc', managercontroller.getAllStudentbystcode)
 router.get('/getstudent/:id', managercontroller.getStudentById);
 router.post("/poststudents/create", managercontroller.createStudent);
