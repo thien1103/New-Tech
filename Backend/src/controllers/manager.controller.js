@@ -269,30 +269,30 @@ const managerController = {
 
     deleteInstructor: async (req, res) => {
         try {
-            const { instructorID } = req.params;
-            const deletedInstructor = await Instructor.findOneAndDelete({ instructorID });
-    
-            // Extract the ID of the deleted instructor
-            const deletedInstructorID = deletedInstructor._id;
-    
-            // Update related documents using the deleted instructor's ID
-            await Guidance.updateMany({ instructor: deletedInstructorID }, { $unset: { instructor: 1 } });
-            await Dissertation.updateMany(
-                { InstructorID: deletedInstructorID },
-                { $unset: { InstructorID: 1, assignedInstructorID: 1 } }
-            );
-    
-            if (deletedInstructor) {
-                // Return the deleted instructor's Object ID in the response
-                res.json({ success: true, message: 'Xóa giáo viên thành công!', deletedInstructorID });
-            } else {
-                res.status(404).json({ success: false, message: 'Không tìm thấy giáo viên để xóa!' });
-            }
+          const { instructorID } = req.params;
+          const deletedInstructor = await Instructor.findOneAndDelete({ instructorID });
+      
+          // Extract the ID of the deleted instructor
+          const deletedInstructorID = deletedInstructor._id;
+      
+          // Update related documents using the deleted instructor's ID
+          await Guidance.updateMany({ instructor: deletedInstructorID }, { $unset: { instructor: "" } });
+          await Dissertation.updateMany(
+            { InstructorID: deletedInstructorID },
+            { $unset: { InstructorID: "" }, $unset: { assignedInstructorID: "" } }
+          );
+      
+          if (deletedInstructor) {
+            // Return the deleted instructor's Object ID in the response
+            res.json({ success: true, message: 'Xóa giáo viên thành công!', deletedInstructorID });
+          } else {
+            res.status(404).json({ success: false, message: 'Không tìm thấy giáo viên để xóa!' });
+          }
         } catch (error) {
-            console.error('Error in deleting Instructor:', error);
-            res.status(500).json({ success: false, message: 'Lỗi server ~ deleteInstructor' });
+          console.error('Error in deleting Instructor:', error);
+          res.status(500).json({ success: false, message: 'Lỗi server ~ deleteInstructor' });
         }
-    },
+      },
 
     // manager dissertation//
     getAlldissertations: async (req, res) => {
